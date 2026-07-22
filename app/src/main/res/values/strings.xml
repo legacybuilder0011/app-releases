@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">TapCopy</string>
+    <string name="service_name">TapCopy screen text service</string>
+    <string name="accessibility_service_description">Shows a user-controlled floating button. When you tap it, TapCopy takes one screenshot, recognizes visible text on-device, and lets you copy the text you choose. It does not read passwords, type for you, automate other apps, or upload screenshots.</string>
+    <string name="enable_service">Enable TapCopy</string>
+    <string name="open_settings">Open Accessibility Settings</string>
+    <string name="service_enabled">TapCopy is active</string>
+    <string name="service_disabled">TapCopy is not active</string>
+    <string name="privacy_title">Your screen stays private</string>
+    <string name="privacy_body">TapCopy only captures the screen after you tap its floating button. Text recognition happens on this device. Screenshots are stored temporarily in the app cache and deleted after use.</string>
+    <string name="how_to_use">How it works</string>
+    <string name="step_one">1. Enable TapCopy in Accessibility Settings.</string>
+    <string name="step_two">2. Open TikTok, Instagram, Pinterest, or another app.</string>
+    <string name="step_three">3. Tap the floating T button.</string>
+    <string name="step_four">4. Tap a highlighted caption block to copy it.</string>
+    <string name="copy_all">Copy all</string>
+    <string name="close">Close</string>
+    <string name="recognizing">Finding text…</string>
+    <string name="tap_text">Tap a highlighted text block</string>
+</resources>
