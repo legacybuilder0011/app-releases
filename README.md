@@ -2,6 +2,12 @@
 
 TapCopy lets a user copy visible text from TikTok, Instagram, Pinterest, YouTube, browsers, and many other Android apps.
 
+> This repository also contains **TapSave** (`downloader/`), a separate video
+> downloader app, and its **backend** (`server/`). TapSave is intentionally a
+> standalone app with no accessibility service, because Google restricts
+> accessibility-service apps to accessibility use. See `server/README.md` for
+> setup. TapSave is for content you own or have permission to download.
+
 ## User flow
 
 1. Open TapCopy and enable its accessibility service.
