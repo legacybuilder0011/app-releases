@@ -11,6 +11,21 @@ TapCopy lets a user copy visible text from TikTok, Instagram, Pinterest, YouTube
 5. Tap any highlighted text block to copy it immediately, or tap **Copy all**.
 6. TapCopy closes and returns you to the previous app.
 
+### Long captions that scroll (Stitch mode)
+
+A single capture can only read the text that is visible on screen, so a caption
+that is collapsed behind "…more" or runs longer than one screen needs Stitch
+mode:
+
+1. Tap the floating `T`, then tap **Stitch long text**.
+2. Tap the caption block (or **Add whole screen**) to add the visible part.
+3. TapCopy returns you to the app. Scroll down a little, tap `T` again, and add
+   the next part. Overlapping lines between captures are removed automatically.
+4. Repeat until you have the whole caption, then tap **Finish & copy**.
+
+Tip: expanding the caption with "…more" first often means one normal capture is
+enough.
+
 ## Privacy design
 
 - OCR runs locally with the bundled ML Kit model.

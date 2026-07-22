@@ -17,4 +17,12 @@
     <string name="close">Close</string>
     <string name="recognizing">Finding text…</string>
     <string name="tap_text">Tap a highlighted text block</string>
+    <string name="stitch_start">Stitch long text</string>
+    <string name="add_screen">Add whole screen</string>
+    <string name="stitch_finish">Finish &amp; copy</string>
+    <string name="stitch_cancel">Cancel</string>
+    <string name="stitch_hint">Stitch mode • %1$d added. Tap the caption (or Add whole screen), scroll, tap T again, then Finish.</string>
+    <string name="stitch_hint_empty">Stitch mode on. Tap the caption (or Add whole screen), then scroll and tap T for the next part.</string>
+    <string name="stitch_added">Added piece %1$d — scroll and tap T for more, then Finish</string>
+    <string name="stitch_empty_copy">Nothing collected yet</string>
 </resources>

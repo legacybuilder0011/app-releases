@@ -29,6 +29,7 @@
             android:textStyle="bold" />
 
         <LinearLayout
+            android:id="@+id/normalButtons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -47,7 +48,22 @@
                 android:textColor="#FFFFFF" />
 
             <Space
-                android:layout_width="12dp"
+                android:layout_width="8dp"
+                android:layout_height="1dp" />
+
+            <Button
+                android:id="@+id/stitchButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/button_secondary"
+                android:enabled="false"
+                android:text="@string/stitch_start"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF" />
+
+            <Space
+                android:layout_width="8dp"
                 android:layout_height="1dp" />
 
             <Button
@@ -57,6 +73,55 @@
                 android:layout_weight="1"
                 android:background="@drawable/button_secondary"
                 android:text="@string/close"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/stitchButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/addScreenButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/button_secondary"
+                android:enabled="false"
+                android:text="@string/add_screen"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF" />
+
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="1dp" />
+
+            <Button
+                android:id="@+id/finishButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/button_primary"
+                android:text="@string/stitch_finish"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF" />
+
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="1dp" />
+
+            <Button
+                android:id="@+id/cancelStitchButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/button_secondary"
+                android:text="@string/stitch_cancel"
                 android:textAllCaps="false"
                 android:textColor="#FFFFFF" />
         </LinearLayout>
