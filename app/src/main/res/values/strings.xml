@@ -14,15 +14,18 @@
     <string name="step_three">3. Tap the floating T button.</string>
     <string name="step_four">4. Tap a highlighted caption block to copy it.</string>
     <string name="copy_all">Copy all</string>
+    <string name="copy_selected">Copy selected</string>
+    <string name="add_selected">Add selected</string>
     <string name="close">Close</string>
     <string name="recognizing">Finding text…</string>
-    <string name="tap_text">Tap a highlighted text block</string>
+    <string name="tap_text">Tap the ⃝ on each block to select it, then Copy selected — or Copy all</string>
+    <string name="need_selection">Tap the circles to select text first</string>
     <string name="stitch_start">Stitch long text</string>
     <string name="add_screen">Add whole screen</string>
     <string name="stitch_finish">Finish &amp; copy</string>
     <string name="stitch_cancel">Cancel</string>
-    <string name="stitch_hint">Stitch mode • %1$d added. Tap the caption (or Add whole screen), scroll, tap T again, then Finish.</string>
-    <string name="stitch_hint_empty">Stitch mode on. Tap the caption (or Add whole screen), then scroll and tap T for the next part.</string>
+    <string name="stitch_hint">Stitch • %1$d added. Select parts and Add (or Add whole screen), scroll, tap T again, then Finish.</string>
+    <string name="stitch_hint_empty">Stitch on. Select the caption and Add (or Add whole screen), then scroll and tap T for the next part.</string>
     <string name="stitch_added">Added piece %1$d — scroll and tap T for more, then Finish</string>
     <string name="stitch_empty_copy">Nothing collected yet</string>
 </resources>

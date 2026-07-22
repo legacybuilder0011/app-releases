@@ -8,7 +8,8 @@ TapCopy lets a user copy visible text from TikTok, Instagram, Pinterest, YouTube
 2. A movable purple `T` button appears over other apps.
 3. Pause a video when the caption you want is visible.
 4. Tap the `T` button.
-5. Tap any highlighted text block to copy it immediately, or tap **Copy all**.
+5. Each block of text is highlighted with a circle. Tap the blocks you want to
+   tick them, then tap **Copy selected** — or tap **Copy all** for everything.
 6. TapCopy closes and returns you to the previous app.
 
 ### Long captions that scroll (Stitch mode)

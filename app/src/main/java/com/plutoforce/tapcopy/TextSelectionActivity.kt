@@ -23,8 +23,10 @@ class TextSelectionActivity : Activity() {
 
     private lateinit var overlay: TextOverlayView
     private lateinit var instructionText: TextView
+    private lateinit var copySelectedButton: Button
     private lateinit var copyAllButton: Button
     private lateinit var stitchButton: Button
+    private lateinit var addSelectedButton: Button
     private lateinit var addScreenButton: Button
     private lateinit var finishButton: Button
     private lateinit var normalButtons: LinearLayout
@@ -40,8 +42,10 @@ class TextSelectionActivity : Activity() {
 
         overlay = findViewById(R.id.textOverlay)
         instructionText = findViewById(R.id.instructionText)
+        copySelectedButton = findViewById(R.id.copySelectedButton)
         copyAllButton = findViewById(R.id.copyAllButton)
         stitchButton = findViewById(R.id.stitchButton)
+        addSelectedButton = findViewById(R.id.addSelectedButton)
         addScreenButton = findViewById(R.id.addScreenButton)
         finishButton = findViewById(R.id.finishButton)
         normalButtons = findViewById(R.id.normalButtons)
@@ -53,12 +57,17 @@ class TextSelectionActivity : Activity() {
             closeAndCleanUp()
         }
 
+        copySelectedButton.setOnClickListener { copySelection() }
         copyAllButton.setOnClickListener {
             if (recognizedText.isNotBlank()) copyAndReturn(recognizedText)
         }
         stitchButton.setOnClickListener {
             StitchBuffer.start(this)
             renderMode()
+        }
+        addSelectedButton.setOnClickListener {
+            val text = overlay.selectedText()
+            if (text.isBlank()) toast(getString(R.string.need_selection)) else stitchAddAndReturn(text)
         }
         addScreenButton.setOnClickListener {
             if (recognizedText.isNotBlank()) stitchAddAndReturn(recognizedText)
@@ -68,25 +77,23 @@ class TextSelectionActivity : Activity() {
         screenshotPath = intent.getStringExtra(EXTRA_SCREENSHOT_PATH)
         val path = screenshotPath
         if (path.isNullOrBlank()) {
-            Toast.makeText(this, "Screenshot not found", Toast.LENGTH_SHORT).show()
+            toast("Screenshot not found")
             finish()
             return
         }
 
         val bitmap = BitmapFactory.decodeFile(path)
         if (bitmap == null) {
-            Toast.makeText(this, "Could not open screenshot", Toast.LENGTH_SHORT).show()
+            toast("Could not open screenshot")
             closeAndCleanUp()
             return
         }
 
         overlay.setScreenshot(bitmap)
-        overlay.onRegionTapped = { region ->
-            if (StitchBuffer.isActive(this)) stitchAddAndReturn(region.text)
-            else copyAndReturn(region.text)
-        }
+        overlay.onSelectionChanged = { count -> updateSelectionButtons(count) }
 
         renderMode()
+        updateSelectionButtons(0)
 
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
         recognizer.process(InputImage.fromBitmap(bitmap, 0))
@@ -100,6 +107,7 @@ class TextSelectionActivity : Activity() {
                 }
                 overlay.setRegions(regions)
                 renderMode()
+                updateSelectionButtons(overlay.selectedCount())
             }
             .addOnFailureListener { error ->
                 textReady = false
@@ -116,7 +124,7 @@ class TextSelectionActivity : Activity() {
         closeAndCleanUp()
     }
 
-    /** Updates buttons and instructions for the current (normal vs. stitch) mode. */
+    /** Toggles button rows and instructions between normal and stitch modes. */
     private fun renderMode() {
         val stitching = StitchBuffer.isActive(this)
         normalButtons.visibility = if (stitching) View.GONE else View.VISIBLE
@@ -126,30 +134,52 @@ class TextSelectionActivity : Activity() {
         stitchButton.isEnabled = textReady
         addScreenButton.isEnabled = textReady
 
-        val count = StitchBuffer.count(this)
-        finishButton.text = if (count > 0) {
-            "${getString(R.string.stitch_finish)} ($count)"
+        val pieces = StitchBuffer.count(this)
+        finishButton.text = if (pieces > 0) {
+            "${getString(R.string.stitch_finish)} ($pieces)"
         } else {
             getString(R.string.stitch_finish)
         }
-        finishButton.isEnabled = count > 0
+        finishButton.isEnabled = pieces > 0
 
         instructionText.text = when {
-            !textReady && !stitching ->
-                "No readable text found. Try pausing the video first."
-            stitching && count > 0 -> getString(R.string.stitch_hint, count)
+            !textReady && !stitching -> "No readable text found. Try pausing the video first."
+            stitching && pieces > 0 -> getString(R.string.stitch_hint, pieces)
             stitching -> getString(R.string.stitch_hint_empty)
             else -> getString(R.string.tap_text)
         }
     }
 
+    /** Reflects how many blocks are ticked in the Copy/Add-selected buttons. */
+    private fun updateSelectionButtons(count: Int) {
+        val hasSelection = count > 0
+        copySelectedButton.isEnabled = hasSelection
+        addSelectedButton.isEnabled = hasSelection
+
+        copySelectedButton.text = if (hasSelection) {
+            "${getString(R.string.copy_selected)} ($count)"
+        } else {
+            getString(R.string.copy_selected)
+        }
+        addSelectedButton.text = if (hasSelection) {
+            "${getString(R.string.add_selected)} ($count)"
+        } else {
+            getString(R.string.add_selected)
+        }
+    }
+
+    private fun copySelection() {
+        val text = overlay.selectedText()
+        if (text.isBlank()) {
+            toast(getString(R.string.need_selection))
+            return
+        }
+        copyAndReturn(text)
+    }
+
     private fun stitchAddAndReturn(text: String) {
         StitchBuffer.append(this, text)
-        Toast.makeText(
-            this,
-            getString(R.string.stitch_added, StitchBuffer.count(this)),
-            Toast.LENGTH_SHORT
-        ).show()
+        toast(getString(R.string.stitch_added, StitchBuffer.count(this)))
         // Return to the previous app so the user can scroll and capture the next part.
         closeAndCleanUp()
     }
@@ -157,12 +187,12 @@ class TextSelectionActivity : Activity() {
     private fun finishStitch() {
         val collected = StitchBuffer.text(this).trim()
         if (collected.isBlank()) {
-            Toast.makeText(this, getString(R.string.stitch_empty_copy), Toast.LENGTH_SHORT).show()
+            toast(getString(R.string.stitch_empty_copy))
             return
         }
         copyToClipboard(collected)
         StitchBuffer.clear(this)
-        Toast.makeText(this, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+        toast("Copied to clipboard")
         window.decorView.postDelayed({ closeAndCleanUp() }, 250L)
     }
 
@@ -170,13 +200,17 @@ class TextSelectionActivity : Activity() {
         val cleanText = text.trim()
         if (cleanText.isBlank()) return
         copyToClipboard(cleanText)
-        Toast.makeText(this, "Copied to clipboard", Toast.LENGTH_SHORT).show()
+        toast("Copied to clipboard")
         window.decorView.postDelayed({ closeAndCleanUp() }, 250L)
     }
 
     private fun copyToClipboard(text: String) {
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         clipboard.setPrimaryClip(ClipData.newPlainText("Copied screen text", text))
+    }
+
+    private fun toast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun closeAndCleanUp() {
