@@ -154,7 +154,8 @@ class CopyTextAccessibilityService : AccessibilityService() {
                             ).apply {
                                 putExtra(TextSelectionActivity.EXTRA_SCREENSHOT_PATH, screenshotFile.absolutePath)
                                 addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
-                                addFlags(android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                addFlags(android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION)
+                                addFlags(android.content.Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
                             }
                             startActivity(intent)
                         }.onFailure {
