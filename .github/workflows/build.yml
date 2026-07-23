@@ -30,29 +30,25 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Build the debug APKs
+      - name: Build the debug APK
         run: ./gradlew assembleDebug --no-daemon
 
-      - name: Rename the APKs
-        run: |
-          cp app/build/outputs/apk/debug/app-debug.apk TapCopy.apk
-          cp downloader/build/outputs/apk/debug/downloader-debug.apk TapSave.apk
+      - name: Rename the APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk TapCopy.apk
 
-      - name: Upload the APKs as build artifacts
+      - name: Upload the APK as a build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TapCopy-apks
-          path: |
-            TapCopy.apk
-            TapSave.apk
+          name: TapCopy-debug-apk
+          path: TapCopy.apk
           if-no-files-found: error
 
-      - name: Publish the APKs to a downloadable Release
+      - name: Publish the APK to a downloadable Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Recreate a rolling "latest" release so the download links stay stable.
+          # Recreate a rolling "latest" release so the download link stays stable.
           gh release delete latest --yes --cleanup-tag 2>/dev/null || true
-          gh release create latest TapCopy.apk TapSave.apk \
-            --title "TapCopy + TapSave (latest build)" \
-            --notes "**TapCopy.apk** — copy on-screen text. **TapSave.apk** — video downloader (needs the yt-dlp backend in /server). Install on Android 11+, allow installing from this source."
+          gh release create latest TapCopy.apk \
+            --title "TapCopy (latest build)" \
+            --notes "Install this APK on your Android 11+ phone. Download **TapCopy.apk**, open it on your phone, allow installing from this source, then open TapCopy and enable the accessibility service."
