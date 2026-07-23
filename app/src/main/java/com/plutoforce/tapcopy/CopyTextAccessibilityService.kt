@@ -46,10 +46,10 @@ class CopyTextAccessibilityService : AccessibilityService() {
     private fun showFloatingBubble() {
         if (bubbleView != null) return
 
-        val size = dp(56)
+        val size = dp(44)
         val bubble = TextView(this).apply {
             text = "T"
-            textSize = 22f
+            textSize = 18f
             gravity = Gravity.CENTER
             setTextColor(android.graphics.Color.WHITE)
             setBackgroundResource(R.drawable.bubble_background)
