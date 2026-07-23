@@ -36,6 +36,49 @@
             android:layout_marginTop="12dp"
             android:orientation="vertical">
 
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btnCaption"
+                        style="@style/CategoryChip"
+                        android:text="@string/cat_caption" />
+
+                    <Button
+                        android:id="@+id/btnHashtags"
+                        style="@style/CategoryChip"
+                        android:text="@string/cat_hashtags" />
+
+                    <Button
+                        android:id="@+id/btnMentions"
+                        style="@style/CategoryChip"
+                        android:text="@string/cat_mentions" />
+
+                    <Button
+                        android:id="@+id/btnLinks"
+                        style="@style/CategoryChip"
+                        android:text="@string/cat_links" />
+
+                    <Button
+                        android:id="@+id/btnEmails"
+                        style="@style/CategoryChip"
+                        android:text="@string/cat_emails" />
+
+                    <Button
+                        android:id="@+id/btnPhones"
+                        style="@style/CategoryChip"
+                        android:text="@string/cat_phones" />
+                </LinearLayout>
+            </HorizontalScrollView>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

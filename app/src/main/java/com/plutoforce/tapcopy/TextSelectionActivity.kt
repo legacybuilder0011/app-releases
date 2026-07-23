@@ -31,6 +31,7 @@ class TextSelectionActivity : Activity() {
     private lateinit var finishButton: Button
     private lateinit var normalButtons: LinearLayout
     private lateinit var stitchButtons: LinearLayout
+    private lateinit var categoryButtons: List<Button>
 
     private var recognizedText: String = ""
     private var textReady: Boolean = false
@@ -73,6 +74,33 @@ class TextSelectionActivity : Activity() {
             if (recognizedText.isNotBlank()) stitchAddAndReturn(recognizedText)
         }
         finishButton.setOnClickListener { finishStitch() }
+
+        val btnCaption = findViewById<Button>(R.id.btnCaption)
+        val btnHashtags = findViewById<Button>(R.id.btnHashtags)
+        val btnMentions = findViewById<Button>(R.id.btnMentions)
+        val btnLinks = findViewById<Button>(R.id.btnLinks)
+        val btnEmails = findViewById<Button>(R.id.btnEmails)
+        val btnPhones = findViewById<Button>(R.id.btnPhones)
+        categoryButtons = listOf(btnCaption, btnHashtags, btnMentions, btnLinks, btnEmails, btnPhones)
+
+        btnCaption.setOnClickListener {
+            copyExtracted(getString(R.string.cat_caption)) { TextExtractor.cleanCaption(it) }
+        }
+        btnHashtags.setOnClickListener {
+            copyExtracted("hashtags") { TextExtractor.hashtags(it).joinToString(" ") }
+        }
+        btnMentions.setOnClickListener {
+            copyExtracted("mentions") { TextExtractor.mentions(it).joinToString(" ") }
+        }
+        btnLinks.setOnClickListener {
+            copyExtracted("links") { TextExtractor.links(it).joinToString("\n") }
+        }
+        btnEmails.setOnClickListener {
+            copyExtracted("emails") { TextExtractor.emails(it).joinToString("\n") }
+        }
+        btnPhones.setOnClickListener {
+            copyExtracted("phone numbers") { TextExtractor.phones(it).joinToString("\n") }
+        }
 
         screenshotPath = intent.getStringExtra(EXTRA_SCREENSHOT_PATH)
         val path = screenshotPath
@@ -133,6 +161,7 @@ class TextSelectionActivity : Activity() {
         copyAllButton.isEnabled = textReady
         stitchButton.isEnabled = textReady
         addScreenButton.isEnabled = textReady
+        categoryButtons.forEach { it.isEnabled = textReady }
 
         val pieces = StitchBuffer.count(this)
         finishButton.text = if (pieces > 0) {
@@ -177,6 +206,26 @@ class TextSelectionActivity : Activity() {
         copyAndReturn(text)
     }
 
+    /** Selected blocks if any are ticked, otherwise the whole screen's text. */
+    private fun sourceText(): String {
+        val selected = overlay.selectedText()
+        return if (selected.isNotBlank()) selected else recognizedText
+    }
+
+    private fun copyExtracted(label: String, extract: (String) -> String) {
+        val src = sourceText()
+        if (src.isBlank()) {
+            toast("No readable text yet")
+            return
+        }
+        val result = extract(src).trim()
+        if (result.isBlank()) {
+            toast(getString(R.string.none_found, label))
+            return
+        }
+        copyAndReturn(result)
+    }
+
     private fun stitchAddAndReturn(text: String) {
         StitchBuffer.append(this, text)
         toast(getString(R.string.stitch_added, StitchBuffer.count(this)))
@@ -207,6 +256,7 @@ class TextSelectionActivity : Activity() {
     private fun copyToClipboard(text: String) {
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         clipboard.setPrimaryClip(ClipData.newPlainText("Copied screen text", text))
+        CopyStore.add(this, text)
     }
 
     private fun toast(message: String) {

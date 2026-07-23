@@ -30,6 +30,10 @@ class MainActivity : Activity() {
                 showDisclosureThenOpenSettings()
             }
         }
+
+        findViewById<Button>(R.id.historyButton).setOnClickListener {
+            startActivity(Intent(this, HistoryActivity::class.java))
+        }
     }
 
     override fun onResume() {

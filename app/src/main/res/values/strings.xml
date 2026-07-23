@@ -28,4 +28,22 @@
     <string name="stitch_hint_empty">Stitch on. Select the caption and Add (or Add whole screen), then scroll and tap T for the next part.</string>
     <string name="stitch_added">Added piece %1$d — scroll and tap T for more, then Finish</string>
     <string name="stitch_empty_copy">Nothing collected yet</string>
+    <string name="cat_caption">Clean caption</string>
+    <string name="cat_hashtags">#Hashtags</string>
+    <string name="cat_mentions">\@Mentions</string>
+    <string name="cat_links">Links</string>
+    <string name="cat_emails">Emails</string>
+    <string name="cat_phones">Phones</string>
+    <string name="cat_hint">Tip: select blocks (or none = whole screen), then tap a category to copy just that.</string>
+    <string name="none_found">No %1$s found</string>
+    <!-- History -->
+    <string name="history_title">Copy history</string>
+    <string name="open_history">Copy history</string>
+    <string name="search_hint">Search copies…</string>
+    <string name="favorites_only">Favourites only</string>
+    <string name="clear_all">Clear all</string>
+    <string name="history_empty">Nothing copied yet. Copied captions show up here.</string>
+    <string name="copy_again">Copy</string>
+    <string name="delete">Delete</string>
+    <string name="copied">Copied to clipboard</string>
 </resources>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="4dp"
+    android:paddingVertical="6dp">
+
+    <TextView
+        android:id="@+id/itemText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:textColor="#1A1A1A"
+        android:textSize="14sp" />
+
+    <Button
+        android:id="@+id/itemFav"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:minWidth="0dp"
+        android:paddingHorizontal="8dp"
+        android:text="☆"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/itemCopy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_primary"
+        android:minWidth="0dp"
+        android:paddingHorizontal="12dp"
+        android:text="@string/copy_again"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp" />
+
+    <Button
+        android:id="@+id/itemDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:minWidth="0dp"
+        android:paddingHorizontal="8dp"
+        android:text="✕"
+        android:textColor="#B42318"
+        android:textSize="16sp" />
+
+</LinearLayout>
