@@ -31,16 +31,29 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build the debug APK
+        env:
+          # Monotonic version so the in-app updater can detect newer builds.
+          VERSION_CODE: ${{ github.run_number }}
+          VERSION_NAME: 1.0.${{ github.run_number }}
         run: ./gradlew assembleDebug --no-daemon
 
       - name: Rename the APK
         run: cp app/build/outputs/apk/debug/app-debug.apk TapCopy.apk
 
-      - name: Upload the APK as a build artifact
+      - name: Write version.json for the in-app updater
+        run: |
+          cat > version.json <<EOF
+          {"versionCode": ${{ github.run_number }}, "versionName": "1.0.${{ github.run_number }}", "apk": "https://github.com/${{ github.repository }}/releases/download/latest/TapCopy.apk"}
+          EOF
+          cat version.json
+
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: TapCopy-debug-apk
-          path: TapCopy.apk
+          path: |
+            TapCopy.apk
+            version.json
           if-no-files-found: error
 
       - name: Publish the APK to a downloadable Release
@@ -49,6 +62,6 @@ jobs:
         run: |
           # Recreate a rolling "latest" release so the download link stays stable.
           gh release delete latest --yes --cleanup-tag 2>/dev/null || true
-          gh release create latest TapCopy.apk \
+          gh release create latest TapCopy.apk version.json \
             --title "TapCopy (latest build)" \
-            --notes "Install this APK on your Android 11+ phone. Download **TapCopy.apk**, open it on your phone, allow installing from this source, then open TapCopy and enable the accessibility service."
+            --notes "Install this APK on your Android 11+ phone. Download **TapCopy.apk**, open it, allow installing from this source, then enable the accessibility service. Future updates can be installed from inside the app (Check for updates)."

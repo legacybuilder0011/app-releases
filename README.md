@@ -29,8 +29,8 @@ enough.
 
 ## Privacy design
 
-- OCR runs locally with the bundled ML Kit model.
-- No internet permission is requested.
+- OCR runs locally with the bundled ML Kit model; recognized text is never uploaded.
+- Internet is used only to check for and download app updates from GitHub.
 - TapCopy does not retrieve the active app's accessibility node tree.
 - A screenshot is taken only after the user taps the floating button.
 - The temporary screenshot is deleted when the selection screen closes.
