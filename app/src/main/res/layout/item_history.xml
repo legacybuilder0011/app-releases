@@ -14,7 +14,7 @@
         android:layout_weight="1"
         android:ellipsize="end"
         android:maxLines="3"
-        android:textColor="#1A1A1A"
+        android:textColor="@color/ink"
         android:textSize="14sp" />
 
     <Button
@@ -25,6 +25,7 @@
         android:minWidth="0dp"
         android:paddingHorizontal="8dp"
         android:text="☆"
+        android:textColor="@color/ink"
         android:textSize="18sp" />
 
     <Button

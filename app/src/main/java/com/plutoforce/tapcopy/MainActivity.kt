@@ -4,12 +4,11 @@ import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
-import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import android.view.View
 import android.view.accessibility.AccessibilityManager
 import android.widget.Button
 import android.widget.TextView
@@ -37,12 +36,30 @@ class MainActivity : Activity() {
             }
         }
 
-        findViewById<Button>(R.id.historyButton).setOnClickListener {
-            startActivity(Intent(this, HistoryActivity::class.java))
+        val openHistory = { startActivity(Intent(this, HistoryActivity::class.java)) }
+        val openFavorites = {
+            startActivity(
+                Intent(this, HistoryActivity::class.java).putExtra(HistoryActivity.EXTRA_FAVORITES, true)
+            )
         }
+        val openAi = { startActivity(Intent(this, AiToolsActivity::class.java)) }
+        val openSettings = { startActivity(Intent(this, SettingsActivity::class.java)) }
+        val proSoon = { toast("Pro features are coming soon.") }
 
-        findViewById<Button>(R.id.updateButton).setOnClickListener {
-            checkForUpdate(userInitiated = true)
+        bind(R.id.cardHistory, openHistory)
+        bind(R.id.navHistory, openHistory)
+        bind(R.id.cardFav, openFavorites)
+        bind(R.id.navFav, openFavorites)
+        bind(R.id.cardAi, openAi)
+        bind(R.id.navAi, openAi)
+        bind(R.id.cardSettings, openSettings)
+        bind(R.id.navSettings, openSettings)
+        bind(R.id.menuButton, openSettings)
+        bind(R.id.upgradeButton, proSoon)
+        bind(R.id.proBadge, proSoon)
+        bind(R.id.navHome) { /* already home */ }
+        bind(R.id.fabT) {
+            toast("Tap the floating T over other apps to capture text.")
         }
     }
 
@@ -55,21 +72,19 @@ class MainActivity : Activity() {
         }
     }
 
-    // --- Update flow ---
+    private fun bind(id: Int, action: () -> Unit) {
+        findViewById<View>(id).setOnClickListener { action() }
+    }
+
+    // --- Update flow (auto on launch; manual lives in Settings) ---
 
     private fun checkForUpdate(userInitiated: Boolean) {
-        if (userInitiated) toast("Checking for updates…")
         Thread {
             val latest = UpdateChecker.fetchLatest()
             val current = UpdateChecker.currentVersionCode(this)
             mainHandler.post {
-                when {
-                    latest == null ->
-                        if (userInitiated) toast("Couldn't check right now. Try again later.")
-                    latest.versionCode > current -> promptUpdate(latest)
-                    else ->
-                        if (userInitiated) toast("You're on the latest version.")
-                }
+                if (latest != null && latest.versionCode > current) promptUpdate(latest)
+                else if (userInitiated) toast("You're on the latest version.")
             }
         }.start()
     }
@@ -84,7 +99,6 @@ class MainActivity : Activity() {
     }
 
     private fun startUpdate(info: UpdateChecker.Info) {
-        // Android needs permission for this app to install packages.
         if (!packageManager.canRequestPackageInstalls()) {
             AlertDialog.Builder(this)
                 .setTitle("Allow updates")
@@ -93,7 +107,7 @@ class MainActivity : Activity() {
                     startActivity(
                         Intent(
                             Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                            Uri.parse("package:$packageName")
+                            android.net.Uri.parse("package:$packageName")
                         )
                     )
                 }
@@ -101,16 +115,12 @@ class MainActivity : Activity() {
                 .show()
             return
         }
-
         toast("Downloading update…")
         Thread {
             val file = UpdateChecker.downloadApk(this, info.apkUrl)
             mainHandler.post {
-                if (file == null) {
-                    toast("Update download failed. Try again later.")
-                } else {
-                    UpdateChecker.installApk(this, file)
-                }
+                if (file == null) toast("Update download failed. Try again later.")
+                else UpdateChecker.installApk(this, file)
             }
         }.start()
     }
@@ -131,8 +141,10 @@ class MainActivity : Activity() {
 
     private fun updateStatus() {
         val enabled = isServiceEnabled()
-        statusText.text = if (enabled) getString(R.string.service_enabled) else getString(R.string.service_disabled)
-        statusText.setTextColor(Color.parseColor(if (enabled) "#168A52" else "#B42318"))
+        statusText.text = if (enabled) "TapCopy is active ●" else "TapCopy is not active"
+        statusText.setTextColor(
+            resources.getColor(if (enabled) R.color.success else R.color.danger, theme)
+        )
         enableButton.text = if (enabled) getString(R.string.open_settings) else getString(R.string.enable_service)
     }
 

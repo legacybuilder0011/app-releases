@@ -14,12 +14,17 @@ import android.widget.BaseAdapter
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 
 /** Browse, search, favourite, re-copy and delete previously copied text. */
 class HistoryActivity : Activity() {
+
+    companion object {
+        const val EXTRA_FAVORITES = "favorites"
+    }
 
     private lateinit var listView: ListView
     private lateinit var searchBox: EditText
@@ -37,6 +42,14 @@ class HistoryActivity : Activity() {
         searchBox = findViewById(R.id.searchBox)
         favOnly = findViewById(R.id.favOnly)
         emptyText = findViewById(R.id.emptyText)
+
+        findViewById<ImageView>(R.id.backButton).setOnClickListener { finish() }
+
+        // Opened from "Favourites" → start filtered to favourites.
+        if (intent.getBooleanExtra(EXTRA_FAVORITES, false)) {
+            favOnly.isChecked = true
+            findViewById<TextView>(R.id.screenTitle).text = getString(R.string.favorites_only)
+        }
 
         adapter = HistoryAdapter()
         listView.adapter = adapter
