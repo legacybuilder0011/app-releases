@@ -20,7 +20,12 @@ object TextExtractor {
         "save", "saved", "remix", "download", "duet", "stitch", "send",
         "add comment", "view all", "see more", "see less", "more", "less",
         "see translation", "show translation", "original", "sponsored", "promoted",
-        "suggested for you", "verified"
+        "suggested for you", "verified",
+        // App navigation / tab chrome that isn't part of a caption.
+        "home", "search", "friends", "inbox", "profile", "shop", "live",
+        "following", "for you", "community", "explore", "explore now",
+        "messages", "notifications", "back", "reels", "discover", "upload",
+        "activity", "add", "post", "log in", "sign up", "subscribe"
     )
 
     private val COUNT = Regex("^\\d+([.,]\\d+)?\\s*[kmb]?\\s*(likes|views|comments|shares|plays)?$", RegexOption.IGNORE_CASE)

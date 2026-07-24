@@ -93,6 +93,18 @@ class TextOverlayView @JvmOverloads constructor(
             .sortedWith(compareBy({ it.box.top }, { it.box.left }))
             .joinToString("\n") { it.text }
 
+    /**
+     * Best guess at the caption: the text block with the most words (captions are
+     * usually the longest run of prose on screen). Empty if nothing qualifies.
+     */
+    fun bestCaptionText(): String {
+        val best = regions.maxByOrNull { wordCount(it.text) } ?: return ""
+        return if (wordCount(best.text) >= 3) best.text else ""
+    }
+
+    private fun wordCount(s: String): Int =
+        s.trim().split(Regex("\\s+")).count { it.isNotBlank() }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val bitmap = screenshot ?: return

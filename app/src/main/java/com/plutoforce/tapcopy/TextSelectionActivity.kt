@@ -83,9 +83,7 @@ class TextSelectionActivity : Activity() {
         val btnPhones = findViewById<Button>(R.id.btnPhones)
         categoryButtons = listOf(btnCaption, btnHashtags, btnMentions, btnLinks, btnEmails, btnPhones)
 
-        btnCaption.setOnClickListener {
-            copyExtracted(getString(R.string.cat_caption)) { TextExtractor.cleanCaption(it) }
-        }
+        btnCaption.setOnClickListener { copyCaption() }
         btnHashtags.setOnClickListener {
             copyExtracted("hashtags") { TextExtractor.hashtags(it).joinToString(" ") }
         }
@@ -210,6 +208,25 @@ class TextSelectionActivity : Activity() {
     private fun sourceText(): String {
         val selected = overlay.selectedText()
         return if (selected.isNotBlank()) selected else recognizedText
+    }
+
+    /**
+     * Clean caption: use ticked blocks if any; otherwise auto-pick the caption
+     * block (longest prose) rather than the whole screen, then strip clutter.
+     */
+    private fun copyCaption() {
+        val selected = overlay.selectedText()
+        val source = when {
+            selected.isNotBlank() -> selected
+            overlay.bestCaptionText().isNotBlank() -> overlay.bestCaptionText()
+            else -> recognizedText
+        }
+        val result = TextExtractor.cleanCaption(source).trim()
+        if (result.isBlank()) {
+            toast(getString(R.string.none_found, getString(R.string.cat_caption)))
+            return
+        }
+        copyAndReturn(result)
     }
 
     private fun copyExtracted(label: String, extract: (String) -> String) {
