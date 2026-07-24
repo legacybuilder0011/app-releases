@@ -53,18 +53,20 @@ class TextOverlayView @JvmOverloads constructor(
     }
     private val circleStrokePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        strokeWidth = 3f
-        color = Color.WHITE
+        strokeWidth = 2f
+        color = accent
     }
+    // White badge with a purple check, matching the design.
     private val circleFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        color = accent
+        color = Color.WHITE
     }
     private val checkPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        strokeWidth = 4f
-        color = Color.WHITE
+        strokeWidth = 3.5f
+        color = accent
         strokeCap = Paint.Cap.ROUND
+        strokeJoin = Paint.Join.ROUND
     }
 
     /** Called with the number of currently selected blocks whenever it changes. */
@@ -113,13 +115,14 @@ class TextOverlayView @JvmOverloads constructor(
         val r = 12f * density
         val cx = box.right - r - 2f * density
         val cy = box.top + r + 2f * density
-        canvas.drawCircle(cx, cy, r, circleFillPaint)
+        canvas.drawCircle(cx, cy, r, circleFillPaint)      // white fill
+        canvas.drawCircle(cx, cy, r, circleStrokePaint)    // thin purple ring
         val check = Path().apply {
-            moveTo(cx - r * 0.45f, cy + r * 0.05f)
-            lineTo(cx - r * 0.12f, cy + r * 0.40f)
-            lineTo(cx + r * 0.50f, cy - r * 0.35f)
+            moveTo(cx - r * 0.42f, cy + r * 0.02f)
+            lineTo(cx - r * 0.10f, cy + r * 0.34f)
+            lineTo(cx + r * 0.46f, cy - r * 0.32f)
         }
-        canvas.drawPath(check, checkPaint)
+        canvas.drawPath(check, checkPaint)                 // purple check
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
