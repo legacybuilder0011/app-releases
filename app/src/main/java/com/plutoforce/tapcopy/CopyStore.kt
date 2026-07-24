@@ -58,6 +58,14 @@ object CopyStore {
         save(context, emptyList())
     }
 
+    /** Drops entries older than [days] (entry id is its creation time in millis). */
+    fun pruneOlderThan(context: Context, days: Int) {
+        if (days <= 0) return
+        val cutoff = System.currentTimeMillis() - days.toLong() * 24 * 60 * 60 * 1000
+        val kept = all(context).filter { it.id >= cutoff }
+        save(context, kept)
+    }
+
     private fun save(context: Context, entries: List<Entry>) {
         val array = JSONArray()
         entries.forEach { e ->

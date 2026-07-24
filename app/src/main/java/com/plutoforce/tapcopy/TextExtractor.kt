@@ -44,6 +44,13 @@ object TextExtractor {
     private fun distinctMatches(regex: Regex, text: String): List<String> =
         regex.findAll(text).map { it.value.trim() }.filter { it.isNotBlank() }.distinct().toList()
 
+    /** Light tidy: trim lines, collapse repeated spaces, drop blank lines. */
+    fun tidy(text: String): String =
+        text.lines()
+            .map { it.trim().replace(Regex("[ \\t]{2,}"), " ") }
+            .filter { it.isNotBlank() }
+            .joinToString("\n")
+
     /** Removes counts, buttons, dates, music titles and bare @handles line by line. */
     fun cleanCaption(text: String): String {
         val kept = text.lines().map { it.trim() }.filter { line ->

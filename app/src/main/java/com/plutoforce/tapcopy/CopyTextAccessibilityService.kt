@@ -1,8 +1,13 @@
 package com.plutoforce.tapcopy
 
 import android.accessibilityservice.AccessibilityService
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.PixelFormat
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.view.Display
@@ -19,16 +24,34 @@ import kotlin.math.abs
 
 class CopyTextAccessibilityService : AccessibilityService() {
 
+    companion object {
+        const val ACTION_REFRESH = "com.plutoforce.tapcopy.REFRESH_BUBBLE"
+    }
+
     private lateinit var windowManager: WindowManager
     private var bubbleView: TextView? = null
     private var bubbleParams: WindowManager.LayoutParams? = null
     private val handler = Handler(Looper.getMainLooper())
     private var isCapturing = false
+    private val hideRunnable = Runnable { applyIdleFade() }
+
+    private val refreshReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            applyBubbleStyle()
+        }
+    }
 
     override fun onServiceConnected() {
         super.onServiceConnected()
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
         showFloatingBubble()
+        val filter = IntentFilter(ACTION_REFRESH)
+        if (Build.VERSION.SDK_INT >= 33) {
+            registerReceiver(refreshReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            @Suppress("UnspecifiedRegisterReceiverFlag")
+            registerReceiver(refreshReceiver, filter)
+        }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
@@ -36,9 +59,8 @@ class CopyTextAccessibilityService : AccessibilityService() {
     override fun onInterrupt() = Unit
 
     override fun onDestroy() {
-        bubbleView?.let { view ->
-            runCatching { windowManager.removeView(view) }
-        }
+        runCatching { unregisterReceiver(refreshReceiver) }
+        bubbleView?.let { view -> runCatching { windowManager.removeView(view) } }
         bubbleView = null
         super.onDestroy()
     }
@@ -46,10 +68,10 @@ class CopyTextAccessibilityService : AccessibilityService() {
     private fun showFloatingBubble() {
         if (bubbleView != null) return
 
-        val size = dp(44)
+        val sizePx = dp(SettingsPrefs.buttonSizeDp(this))
         val bubble = TextView(this).apply {
             text = "T"
-            textSize = 18f
+            textSize = SettingsPrefs.buttonSizeDp(this@CopyTextAccessibilityService) * 0.4f
             gravity = Gravity.CENTER
             setTextColor(android.graphics.Color.WHITE)
             setBackgroundResource(R.drawable.bubble_background)
@@ -58,22 +80,65 @@ class CopyTextAccessibilityService : AccessibilityService() {
         }
 
         val params = WindowManager.LayoutParams(
-            size,
-            size,
+            sizePx,
+            sizePx,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = Gravity.TOP or Gravity.START
-            x = resources.displayMetrics.widthPixels - size - dp(12)
-            y = resources.displayMetrics.heightPixels / 2
         }
+        positionParams(params, sizePx)
 
         bubble.setOnTouchListener(DragOrTapTouchListener(params))
         windowManager.addView(bubble, params)
         bubbleView = bubble
         bubbleParams = params
+        bubble.alpha = baseAlpha()
+        scheduleIdleFade()
+    }
+
+    private fun positionParams(params: WindowManager.LayoutParams, sizePx: Int) {
+        val savedX = SettingsPrefs.bubbleX(this)
+        val savedY = SettingsPrefs.bubbleY(this)
+        if (savedX >= 0 && savedY >= 0) {
+            params.x = savedX
+            params.y = savedY
+        } else {
+            params.x = resources.displayMetrics.widthPixels - sizePx - dp(12)
+            params.y = resources.displayMetrics.heightPixels / 3
+        }
+    }
+
+    /** Re-apply size / opacity / position to the live bubble (from Settings). */
+    private fun applyBubbleStyle() {
+        val view = bubbleView ?: return
+        val params = bubbleParams ?: return
+        val sizePx = dp(SettingsPrefs.buttonSizeDp(this))
+        params.width = sizePx
+        params.height = sizePx
+        positionParams(params, sizePx)
+        view.textSize = SettingsPrefs.buttonSizeDp(this) * 0.4f
+        view.alpha = baseAlpha()
+        runCatching { windowManager.updateViewLayout(view, params) }
+        scheduleIdleFade()
+    }
+
+    private fun baseAlpha(): Float = (SettingsPrefs.buttonOpacity(this).coerceIn(20, 100)) / 100f
+
+    private fun scheduleIdleFade() {
+        handler.removeCallbacks(hideRunnable)
+        if (SettingsPrefs.autoHide(this)) handler.postDelayed(hideRunnable, 4000L)
+    }
+
+    private fun applyIdleFade() {
+        if (SettingsPrefs.autoHide(this)) bubbleView?.alpha = minOf(0.3f, baseAlpha())
+    }
+
+    private fun wake() {
+        bubbleView?.alpha = baseAlpha()
+        scheduleIdleFade()
     }
 
     private inner class DragOrTapTouchListener(
@@ -93,6 +158,7 @@ class CopyTextAccessibilityService : AccessibilityService() {
                     initialTouchX = event.rawX
                     initialTouchY = event.rawY
                     downTime = System.currentTimeMillis()
+                    wake()
                     return true
                 }
 
@@ -108,6 +174,10 @@ class CopyTextAccessibilityService : AccessibilityService() {
                     val duration = System.currentTimeMillis() - downTime
                     if (moved < dp(12) && duration < 600L) {
                         captureScreen()
+                    } else {
+                        // Remember where the user parked the button.
+                        SettingsPrefs.setBubblePos(this@CopyTextAccessibilityService, params.x, params.y)
+                        scheduleIdleFade()
                     }
                     return true
                 }
@@ -147,15 +217,16 @@ class CopyTextAccessibilityService : AccessibilityService() {
                             }
                         }.onSuccess {
                             bubbleView?.visibility = View.VISIBLE
+                            wake()
                             isCapturing = false
-                            val intent = android.content.Intent(
+                            val intent = Intent(
                                 this@CopyTextAccessibilityService,
                                 TextSelectionActivity::class.java
                             ).apply {
                                 putExtra(TextSelectionActivity.EXTRA_SCREENSHOT_PATH, screenshotFile.absolutePath)
-                                addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
-                                addFlags(android.content.Intent.FLAG_ACTIVITY_NO_ANIMATION)
-                                addFlags(android.content.Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+                                addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)
                             }
                             startActivity(intent)
                         }.onFailure {
@@ -178,6 +249,7 @@ class CopyTextAccessibilityService : AccessibilityService() {
 
     private fun finishCaptureWithError(message: String) {
         bubbleView?.visibility = View.VISIBLE
+        wake()
         isCapturing = false
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }

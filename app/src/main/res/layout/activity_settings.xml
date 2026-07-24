@@ -10,8 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="18dp">
 
+        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -27,34 +28,290 @@
                 android:tint="@color/ink" />
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_marginStart="12dp"
                 android:text="Settings"
                 android:textColor="@color/ink"
-                android:textSize="22sp"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/proBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/pro_badge"
+                android:text="👑 Pro"
+                android:textColor="#FFFFFF"
+                android:textSize="13sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <TextView android:id="@+id/rowUpdates" style="@style/AiRow"
-            android:text="⬇️  Check for updates\nGet the newest version" />
+        <!-- 1. FLOATING BUTTON -->
+        <LinearLayout style="@style/SettingsCard">
+            <TextView style="@style/SectionLabel" android:text="1. FLOATING BUTTON" />
 
-        <TextView android:id="@+id/rowAccessibility" style="@style/AiRow"
-            android:text="♿  Accessibility service\nEnable or manage TapCopy" />
+            <LinearLayout android:id="@+id/rowBtnSize" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="⛶" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Button size" />
+                    <TextView style="@style/SSub" android:text="Adjust the size of the floating button" />
+                </LinearLayout>
+                <TextView android:id="@+id/valBtnSize" style="@style/SValue" android:text="Medium" />
+                <TextView style="@style/SValue" android:text="  ›" />
+            </LinearLayout>
 
-        <TextView style="@style/AiRow"
-            android:clickable="false"
-            android:text="🔒  Your screen stays private\nText is recognised on your device. Internet is used only to check for and download app updates — your screen text is never uploaded." />
+            <LinearLayout android:id="@+id/rowBtnOpacity" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="◐" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Button opacity" />
+                    <TextView style="@style/SSub" android:text="Set how transparent the button is" />
+                </LinearLayout>
+                <TextView android:id="@+id/valBtnOpacity" style="@style/SValue" android:text="100%" />
+                <TextView style="@style/SValue" android:text="  ›" />
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/versionText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:gravity="center"
-            android:text="TapCopy"
-            android:textColor="@color/faint"
-            android:textSize="13sp" />
+            <LinearLayout android:id="@+id/rowPositionReset" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="🎯" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Position reset" />
+                    <TextView style="@style/SSub" android:text="Return the floating button to default position" />
+                </LinearLayout>
+                <TextView style="@style/SValue" android:text="Reset" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false" android:background="@null">
+                <TextView style="@style/SEmoji" android:text="🙈" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Auto-hide when idle" />
+                    <TextView style="@style/SSub" android:text="Fade the button after a period of inactivity" />
+                </LinearLayout>
+                <Switch android:id="@+id/swAutoHide" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 2. CAPTURE & COPY -->
+        <LinearLayout style="@style/SettingsCard">
+            <TextView style="@style/SectionLabel" android:text="2. CAPTURE &amp; COPY" />
+
+            <LinearLayout style="@style/SRow" android:clickable="false" android:background="@null">
+                <TextView style="@style/SEmoji" android:text="🅰" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Auto-detect captions" />
+                    <TextView style="@style/SSub" android:text="Pre-select the caption block automatically" />
+                </LinearLayout>
+                <Switch android:id="@+id/swAutoDetect" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowDefaultAction" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="⚡" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Default action" />
+                    <TextView style="@style/SSub" android:text="What happens after detection" />
+                </LinearLayout>
+                <TextView android:id="@+id/valDefaultAction" style="@style/SValue" android:text="Ask" />
+                <TextView style="@style/SValue" android:text="  ›" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowSelectionMode" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="⬚" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Selection mode" />
+                    <TextView style="@style/SSub" android:text="How text is grouped for selection" />
+                </LinearLayout>
+                <TextView android:id="@+id/valSelectionMode" style="@style/SValue" android:text="Block" />
+                <TextView style="@style/SValue" android:text="  ›" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false" android:background="@null">
+                <TextView style="@style/SEmoji" android:text="🗐" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Stitch long text" />
+                    <TextView style="@style/SSub" android:text="Combine multiple captures into one" />
+                </LinearLayout>
+                <Switch android:id="@+id/swStitch" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 3. OCR & LANGUAGE -->
+        <LinearLayout style="@style/SettingsCard">
+            <TextView style="@style/SectionLabel" android:text="3. OCR &amp; LANGUAGE" />
+
+            <LinearLayout android:id="@+id/rowRecogLang" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="🔤" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Text recognition language" />
+                    <TextView style="@style/SSub" android:text="Language used to recognize text" />
+                </LinearLayout>
+                <TextView style="@style/SValue" android:text="Latin  ›" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowTransLang" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="🌐" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Translation language" />
+                    <TextView style="@style/SSub" android:text="Translate copied text to this language" />
+                </LinearLayout>
+                <TextView style="@style/SValue" android:text="Soon  ›" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false" android:background="@null">
+                <TextView style="@style/SEmoji" android:text="✨" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Improve text cleanup" />
+                    <TextView style="@style/SSub" android:text="Remove extra spaces and fix line breaks" />
+                </LinearLayout>
+                <Switch android:id="@+id/swImproveCleanup" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 4. PRIVACY & STORAGE -->
+        <LinearLayout style="@style/SettingsCard">
+            <TextView style="@style/SectionLabel" android:text="4. PRIVACY &amp; STORAGE" />
+
+            <LinearLayout style="@style/SRow" android:clickable="false" android:background="@null">
+                <TextView style="@style/SEmoji" android:text="🛡" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="On-device processing" />
+                    <TextView style="@style/SSub" android:text="Recognise text on this device (recommended)" />
+                </LinearLayout>
+                <Switch android:id="@+id/swOnDevice" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false" android:background="@null">
+                <TextView style="@style/SEmoji" android:text="🗑" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Delete screenshots after use" />
+                    <TextView style="@style/SSub" android:text="Remove the temporary screenshot automatically" />
+                </LinearLayout>
+                <Switch android:id="@+id/swDeleteShots" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowClearCache" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="🗄" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Clear cache" />
+                    <TextView style="@style/SSub" android:text="Free up space used by TapCopy" />
+                </LinearLayout>
+                <TextView android:id="@+id/valCacheSize" style="@style/SValue" android:text="0 MB" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowRetention" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="🕐" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Copy history retention" />
+                    <TextView style="@style/SSub" android:text="Keep copied items for" />
+                </LinearLayout>
+                <TextView android:id="@+id/valRetention" style="@style/SValue" android:text="30 days" />
+                <TextView style="@style/SValue" android:text="  ›" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 5. NOTIFICATIONS & FEEDBACK -->
+        <LinearLayout style="@style/SettingsCard">
+            <TextView style="@style/SectionLabel" android:text="5. NOTIFICATIONS &amp; FEEDBACK" />
+
+            <LinearLayout style="@style/SRow" android:clickable="false" android:background="@null">
+                <TextView style="@style/SEmoji" android:text="📳" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Haptic feedback" />
+                    <TextView style="@style/SSub" android:text="Vibrate on actions" />
+                </LinearLayout>
+                <Switch android:id="@+id/swHaptics" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false" android:background="@null">
+                <TextView style="@style/SEmoji" android:text="✅" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Copy confirmation toast" />
+                    <TextView style="@style/SSub" android:text="Show a toast after copying" />
+                </LinearLayout>
+                <Switch android:id="@+id/swCopyToast" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false" android:background="@null">
+                <TextView style="@style/SEmoji" android:text="🔊" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Sound on copy" />
+                    <TextView style="@style/SSub" android:text="Play a short sound when copied" />
+                </LinearLayout>
+                <Switch android:id="@+id/swSound" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 6. APPEARANCE -->
+        <LinearLayout style="@style/SettingsCard">
+            <TextView style="@style/SectionLabel" android:text="6. APPEARANCE" />
+
+            <LinearLayout android:id="@+id/rowDarkMode" style="@style/SRow" android:clickable="false" android:background="@null">
+                <TextView style="@style/SEmoji" android:text="🌙" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Dark mode" />
+                    <TextView style="@style/SSub" android:text="Use dark theme" />
+                </LinearLayout>
+                <Switch android:id="@+id/swDarkMode" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowAccent" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="🎨" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Accent color" />
+                    <TextView style="@style/SSub" android:text="Choose your accent color" />
+                </LinearLayout>
+                <TextView style="@style/SValue" android:text="Soon  ›" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowTextSize" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="🔠" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Text size" />
+                    <TextView style="@style/SSub" android:text="Adjust app text size" />
+                </LinearLayout>
+                <TextView style="@style/SValue" android:text="Soon  ›" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 7. HELP & ABOUT -->
+        <LinearLayout style="@style/SettingsCard">
+            <TextView style="@style/SectionLabel" android:text="7. HELP &amp; ABOUT" />
+
+            <LinearLayout android:id="@+id/rowHowItWorks" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="❓" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="How it works" />
+                    <TextView style="@style/SSub" android:text="Learn how TapCopy captures text" />
+                </LinearLayout>
+                <TextView style="@style/SValue" android:text="›" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowPrivacy" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="🛡" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Privacy policy" />
+                    <TextView style="@style/SSub" android:text="Read our privacy policy" />
+                </LinearLayout>
+                <TextView style="@style/SValue" android:text="›" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowContact" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="✉" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Contact support" />
+                    <TextView style="@style/SSub" android:text="Get help or send feedback" />
+                </LinearLayout>
+                <TextView style="@style/SValue" android:text="›" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowUpdates" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="⬇" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="Check for updates" />
+                    <TextView android:id="@+id/versionText" style="@style/SSub" android:text="Current version" />
+                </LinearLayout>
+                <TextView android:id="@+id/valUpdateStatus" style="@style/SValue" android:text="Check" />
+            </LinearLayout>
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

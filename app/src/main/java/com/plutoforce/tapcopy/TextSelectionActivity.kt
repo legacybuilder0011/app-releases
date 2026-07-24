@@ -4,7 +4,12 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.graphics.BitmapFactory
+import android.media.AudioManager
+import android.media.ToneGenerator
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
@@ -126,14 +131,24 @@ class TextSelectionActivity : Activity() {
             .addOnSuccessListener { result ->
                 recognizedText = result.text.trim()
                 textReady = recognizedText.isNotBlank()
-                val regions = result.textBlocks.mapNotNull { block ->
-                    val box = block.boundingBox ?: return@mapNotNull null
-                    val text = block.text.trim()
-                    if (text.isBlank()) null else TextOverlayView.TextRegion(text, box)
+                val regions = if (SettingsPrefs.selectionMode(this) == "line") {
+                    result.textBlocks.flatMap { it.lines }.mapNotNull { line ->
+                        val box = line.boundingBox ?: return@mapNotNull null
+                        val text = line.text.trim()
+                        if (text.isBlank()) null else TextOverlayView.TextRegion(text, box)
+                    }
+                } else {
+                    result.textBlocks.mapNotNull { block ->
+                        val box = block.boundingBox ?: return@mapNotNull null
+                        val text = block.text.trim()
+                        if (text.isBlank()) null else TextOverlayView.TextRegion(text, box)
+                    }
                 }
                 overlay.setRegions(regions)
+                if (SettingsPrefs.autoDetectCaptions(this)) overlay.selectCaption()
                 renderMode()
                 updateSelectionButtons(overlay.selectedCount())
+                applyDefaultAction()
             }
             .addOnFailureListener { error ->
                 textReady = false
@@ -158,6 +173,7 @@ class TextSelectionActivity : Activity() {
 
         copyAllButton.isEnabled = textReady
         stitchButton.isEnabled = textReady
+        stitchButton.visibility = if (SettingsPrefs.stitchEnabled(this)) View.VISIBLE else View.GONE
         addScreenButton.isEnabled = textReady
         categoryButtons.forEach { it.isEnabled = textReady }
 
@@ -262,11 +278,22 @@ class TextSelectionActivity : Activity() {
         window.decorView.postDelayed({ closeAndCleanUp() }, 250L)
     }
 
+    /** Performs the user's chosen default action once text is ready. */
+    private fun applyDefaultAction() {
+        if (!textReady) return
+        when (SettingsPrefs.defaultAction(this)) {
+            "caption" -> copyCaption()
+            "all" -> if (recognizedText.isNotBlank()) copyAndReturn(recognizedText)
+            else -> Unit
+        }
+    }
+
     private fun copyAndReturn(text: String) {
-        val cleanText = text.trim()
-        if (cleanText.isBlank()) return
-        copyToClipboard(cleanText)
-        toast("Copied to clipboard")
+        var clean = text.trim()
+        if (clean.isBlank()) return
+        if (SettingsPrefs.improveCleanup(this)) clean = TextExtractor.tidy(clean)
+        copyToClipboard(clean)
+        onCopiedFeedback()
         window.decorView.postDelayed({ closeAndCleanUp() }, 250L)
     }
 
@@ -276,12 +303,36 @@ class TextSelectionActivity : Activity() {
         CopyStore.add(this, text)
     }
 
+    /** Haptic / sound / toast feedback per the user's settings. */
+    private fun onCopiedFeedback() {
+        if (SettingsPrefs.haptics(this)) {
+            val vibrator = getSystemService(VIBRATOR_SERVICE) as? Vibrator
+            runCatching {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator?.vibrate(VibrationEffect.createOneShot(30, VibrationEffect.DEFAULT_AMPLITUDE))
+                } else {
+                    @Suppress("DEPRECATION") vibrator?.vibrate(30)
+                }
+            }
+        }
+        if (SettingsPrefs.soundOnCopy(this)) {
+            runCatching {
+                val tone = ToneGenerator(AudioManager.STREAM_SYSTEM, 80)
+                tone.startTone(ToneGenerator.TONE_PROP_ACK, 150)
+                window.decorView.postDelayed({ runCatching { tone.release() } }, 300)
+            }
+        }
+        if (SettingsPrefs.copyToast(this)) toast(getString(R.string.copied))
+    }
+
     private fun toast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
     private fun closeAndCleanUp() {
-        screenshotPath?.let { path -> runCatching { File(path).delete() } }
+        if (SettingsPrefs.deleteScreenshots(this)) {
+            screenshotPath?.let { path -> runCatching { File(path).delete() } }
+        }
         finishAndRemoveTask()
     }
 }

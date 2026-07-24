@@ -105,6 +105,18 @@ class TextOverlayView @JvmOverloads constructor(
     private fun wordCount(s: String): Int =
         s.trim().split(Regex("\\s+")).count { it.isNotBlank() }
 
+    /** Selects the caption block (most words) if one qualifies. */
+    fun selectCaption() {
+        if (regions.isEmpty()) return
+        val idx = regions.indices.maxByOrNull { wordCount(regions[it].text) } ?: return
+        if (wordCount(regions[idx].text) >= 3) {
+            selected.clear()
+            selected.add(idx)
+            invalidate()
+            onSelectionChanged?.invoke(selected.size)
+        }
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val bitmap = screenshot ?: return
