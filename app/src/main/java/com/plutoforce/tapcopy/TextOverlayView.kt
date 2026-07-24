@@ -107,22 +107,19 @@ class TextOverlayView @JvmOverloads constructor(
         }
     }
 
+    /** A purple check badge at the block's top-right corner, only when selected. */
     private fun drawCheckCircle(canvas: Canvas, box: RectF, isSelected: Boolean) {
-        val r = 11f * density
-        val cx = box.left + r + 3f * density
-        val cy = box.top + r + 3f * density
-        if (isSelected) {
-            canvas.drawCircle(cx, cy, r, circleFillPaint)
-            val check = Path().apply {
-                moveTo(cx - r * 0.45f, cy + r * 0.05f)
-                lineTo(cx - r * 0.10f, cy + r * 0.40f)
-                lineTo(cx + r * 0.50f, cy - r * 0.35f)
-            }
-            canvas.drawPath(check, checkPaint)
-        } else {
-            canvas.drawCircle(cx, cy, r, circleBgPaint)
-            canvas.drawCircle(cx, cy, r, circleStrokePaint)
+        if (!isSelected) return
+        val r = 12f * density
+        val cx = box.right - r - 2f * density
+        val cy = box.top + r + 2f * density
+        canvas.drawCircle(cx, cy, r, circleFillPaint)
+        val check = Path().apply {
+            moveTo(cx - r * 0.45f, cy + r * 0.05f)
+            lineTo(cx - r * 0.12f, cy + r * 0.40f)
+            lineTo(cx + r * 0.50f, cy - r * 0.35f)
         }
+        canvas.drawPath(check, checkPaint)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
