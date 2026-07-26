@@ -62,9 +62,9 @@
             android:layout_height="38dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             android:padding="9dp"
-            android:src="@drawable/ic_speed"
+            android:src="@drawable/ic_tune"
             android:tint="@color/ink"
-            android:contentDescription="@string/prompter_speed" />
+            android:contentDescription="@string/prompter_adjust" />
 
         <TextView
             android:id="@+id/barSpeedValue"

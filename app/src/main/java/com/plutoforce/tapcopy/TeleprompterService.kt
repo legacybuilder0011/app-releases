@@ -92,6 +92,7 @@ class TeleprompterService : Service() {
     private var editorView: View? = null
     private var playView: View? = null
     private var countdownView: View? = null
+    private var adjustView: View? = null
     private var playParams: WindowManager.LayoutParams? = null
 
     private var scriptText: TextView? = null
@@ -178,6 +179,7 @@ class TeleprompterService : Service() {
         removeView(editorView); editorView = null
         removeView(playView); playView = null
         removeView(countdownView); countdownView = null
+        removeView(adjustView); adjustView = null
         isActive = false
         isPlaying = false
         showBubble(true)
@@ -188,6 +190,7 @@ class TeleprompterService : Service() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         // Re-fit the script box to the new screen size instead of losing it.
+        hideAdjustWindow()
         val params = playParams ?: return
         val view = playView ?: return
         applyBoxMetrics(params)
@@ -198,6 +201,7 @@ class TeleprompterService : Service() {
     // --- Editor ------------------------------------------------------------
 
     private fun showEditor() {
+        hideAdjustWindow()
         removeView(playView); playView = null
         stopScrolling()
         state = State.EDITING
@@ -253,7 +257,11 @@ class TeleprompterService : Service() {
             adjustPanel.visibility =
                 if (adjustPanel.visibility == View.VISIBLE) View.GONE else View.VISIBLE
         }
-        wireAdjustPanel(view, input, estimate)
+        wireAdjustControls(
+            view,
+            onSpeedChanged = { updateEstimate(estimate, input.text.toString()) },
+            onSizeChanged = { size -> input.textSize = size.coerceIn(14, 34).toFloat() }
+        )
 
         view.findViewById<View>(R.id.closeEditor).setOnClickListener {
             saveDraft(input.text.toString())
@@ -293,8 +301,16 @@ class TeleprompterService : Service() {
         editorView = view
     }
 
-    /** The two sliders behind the tune button: scroll speed and text size. */
-    private fun wireAdjustPanel(root: View, input: EditText, estimate: TextView) {
+    /**
+     * Wires the two sliders behind a tune button: scroll speed and text size.
+     * Used by both the editor panel and the playback panel, which each react to
+     * changes in their own way.
+     */
+    private fun wireAdjustControls(
+        root: View,
+        onSpeedChanged: (Int) -> Unit,
+        onSizeChanged: (Int) -> Unit
+    ) {
         val speedSeek = root.findViewById<android.widget.SeekBar>(R.id.adjustSpeedSeek)
         val speedValue = root.findViewById<TextView>(R.id.adjustSpeedValue)
         val sizeSeek = root.findViewById<android.widget.SeekBar>(R.id.adjustSizeSeek)
@@ -307,7 +323,7 @@ class TeleprompterService : Service() {
                 TeleprompterPrefs.setSpeedWpm(this@TeleprompterService, MIN_WPM + progress)
                 val wpm = TeleprompterPrefs.speedWpm(this@TeleprompterService)
                 speedValue.text = getString(R.string.prompter_wpm_short, wpm)
-                updateEstimate(estimate, input.text.toString())
+                onSpeedChanged(wpm)
             }
 
             override fun onStartTrackingTouch(bar: android.widget.SeekBar?) = Unit
@@ -321,13 +337,52 @@ class TeleprompterService : Service() {
                 val size = MIN_TEXT_SIZE + progress
                 TeleprompterPrefs.setTextSize(this@TeleprompterService, size)
                 sizeValue.text = "${size}sp"
-                // Show the change straight away in the script box.
-                input.textSize = size.coerceIn(14, 34).toFloat()
+                onSizeChanged(size)
             }
 
             override fun onStartTrackingTouch(bar: android.widget.SeekBar?) = Unit
             override fun onStopTrackingTouch(bar: android.widget.SeekBar?) = Unit
         })
+    }
+
+    /** The speed / text-size panel shown under the script box while paused. */
+    private fun toggleAdjustWindow() {
+        if (adjustView != null) {
+            hideAdjustWindow()
+            return
+        }
+        val params = playParams ?: return
+        val panel = LayoutInflater.from(this).inflate(R.layout.overlay_prompter_adjust, null)
+        panel.background = boxBackground()
+
+        wireAdjustControls(
+            panel,
+            onSpeedChanged = { /* picked up on the next frame automatically */ },
+            onSizeChanged = {
+                scriptText?.let { styleScriptText(it) }
+                rebuildScriptLayout()
+            }
+        )
+
+        val metrics = resources.displayMetrics
+        val panelParams = WindowManager.LayoutParams(
+            params.width,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            overlayType(),
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            PixelFormat.TRANSLUCENT
+        ).apply {
+            gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+            y = (params.y + params.height + dp(8))
+                .coerceAtMost(maxOf(0, metrics.heightPixels - dp(190)))
+        }
+        runCatching { windowManager.addView(panel, panelParams) }
+            .onSuccess { adjustView = panel }
+    }
+
+    private fun hideAdjustWindow() {
+        removeView(adjustView)
+        adjustView = null
     }
 
     private fun populateSavedList(container: android.widget.LinearLayout, input: EditText) {
@@ -431,9 +486,9 @@ class TeleprompterService : Service() {
         styleScriptText(text)
 
         view.findViewById<View>(R.id.barRestart).setOnClickListener { restart() }
-        view.findViewById<View>(R.id.barSpeed).setOnClickListener { bumpSpeed() }
+        view.findViewById<View>(R.id.barSpeed).setOnClickListener { toggleAdjustWindow() }
         view.findViewById<View>(R.id.barEdit).setOnClickListener {
-            stopScrolling(); showEditor()
+            stopScrolling(); hideAdjustWindow(); showEditor()
         }
         view.findViewById<View>(R.id.barClose).setOnClickListener { askClose() }
         view.findViewById<View>(R.id.confirmCancel).setOnClickListener {
@@ -586,6 +641,9 @@ class TeleprompterService : Service() {
         state = State.PLAYING
         isPlaying = true
         view(R.id.pausedBadge)?.visibility = View.GONE
+        // Back to clean playback: controls and the floating button get out of the way.
+        hideControlBar()
+        showBubble(false)
         lastFrameNanos = System.nanoTime()
         handler.removeCallbacks(frameRunnable)
         handler.post(frameRunnable)
@@ -696,7 +754,8 @@ class TeleprompterService : Service() {
             (it as TextView).setText(R.string.prompter_finished)
             it.visibility = View.VISIBLE
         }
-        showControlBar()
+        showControlBar(persistent = true)
+        showBubble(true)
         if (TeleprompterPrefs.clearAfterFinish(this)) {
             script = ""
             TeleprompterPrefs.setDraft(this, "")
@@ -715,6 +774,11 @@ class TeleprompterService : Service() {
                     (it as TextView).setText(R.string.prompter_paused)
                     it.visibility = View.VISIBLE
                 }
+                // Paused means "give me the controls": the bar stays up until
+                // playback resumes, and the floating button comes back so the
+                // user is never stuck with a script and no way out.
+                showControlBar(persistent = true)
+                showBubble(true)
                 saveProgress()
             }
             State.PAUSED -> resumeScrolling()
@@ -731,7 +795,8 @@ class TeleprompterService : Service() {
             if (now - lastRestartPrompt > 2500L) {
                 lastRestartPrompt = now
                 toast(getString(R.string.prompter_restart_again))
-                showControlBar()
+                // Keep the bar up while paused so the second tap is reachable.
+                showControlBar(persistent = state != State.PLAYING)
                 return
             }
         }
@@ -748,30 +813,32 @@ class TeleprompterService : Service() {
 
     private var lastRestartPrompt = 0L
 
-    private fun bumpSpeed() {
-        val next = when (val wpm = TeleprompterPrefs.speedWpm(this)) {
-            in 0..79 -> wpm + 20
-            in 80..199 -> wpm + 25
-            else -> 50
-        }
-        TeleprompterPrefs.setSpeedWpm(this, next)
-        (view(R.id.barSpeedValue) as? TextView)?.text =
-            getString(R.string.prompter_wpm_short, TeleprompterPrefs.speedWpm(this))
-        showControlBar()
-    }
-
     private fun askClose() {
         view(R.id.confirmClose)?.visibility = View.VISIBLE
     }
 
-    private fun showControlBar() {
-        if (!TeleprompterPrefs.longPressControls(this) && state == State.PLAYING) return
+    /**
+     * Shows the control bar. While playing it appears briefly (long-press) and
+     * fades out; when paused or finished it stays put so there's always a
+     * visible way to adjust, edit or close.
+     */
+    private fun showControlBar(persistent: Boolean = false) {
+        if (!persistent && state == State.PLAYING &&
+            !TeleprompterPrefs.longPressControls(this)
+        ) return
         val bar = view(R.id.controlBar) ?: return
         (view(R.id.barSpeedValue) as? TextView)?.text =
             getString(R.string.prompter_wpm_short, TeleprompterPrefs.speedWpm(this))
         bar.visibility = View.VISIBLE
         handler.removeCallbacks(hideBarRunnable)
-        handler.postDelayed(hideBarRunnable, 3000L)
+        if (!persistent) handler.postDelayed(hideBarRunnable, 3000L)
+    }
+
+    private fun hideControlBar() {
+        handler.removeCallbacks(hideBarRunnable)
+        view(R.id.controlBar)?.visibility = View.GONE
+        view(R.id.confirmClose)?.visibility = View.GONE
+        hideAdjustWindow()
     }
 
     // --- Gestures on the script box ---------------------------------------
@@ -854,6 +921,7 @@ class TeleprompterService : Service() {
         playView?.visibility = target
         editorView?.visibility = target
         countdownView?.visibility = target
+        adjustView?.visibility = target
     }
 
     // --- Helpers ----------------------------------------------------------
