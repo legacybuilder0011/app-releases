@@ -73,9 +73,12 @@
     <string name="prompter_continue">Continue</string>
     <string name="prompter_promise">Double-tap. Paste. Press Play. Speak confidently anywhere.</string>
 
-    <string name="prompter_hint">Paste or type your script here…</string>
+    <string name="prompter_hint">Add your script here…</string>
     <string name="prompter_paste">Paste</string>
     <string name="prompter_saved">Saved</string>
+    <string name="prompter_adjust">Speed and text size</string>
+    <string name="prompter_adjust_speed">Teleprompter speed</string>
+    <string name="prompter_adjust_size">Text size</string>
     <string name="prompter_no_saved">No saved scripts yet.</string>
     <string name="prompter_settings">Teleprompter settings</string>
     <string name="prompter_play">Play</string>

@@ -72,6 +72,10 @@ class TeleprompterService : Service() {
             instance?.handleForegroundApp(packageName)
         }
 
+        /** Slider ranges, shared with the settings screen. */
+        private const val MIN_WPM = 50          // seek max 200 → 50..250 wpm
+        private const val MIN_TEXT_SIZE = 18    // seek max 40  → 18..58 sp
+
         private val SENSITIVE_HINTS = listOf(
             "bank", "wallet", "pay", "upi", "money", "finance", "card",
             "password", "authenticator", "vault", "keychain", "crypto"
@@ -102,6 +106,9 @@ class TeleprompterService : Service() {
     private var offset = 0f
     private var lastFrameNanos = 0L
     private var pauseUntil = 0L
+    private var holdUntil = 0L
+    private var contentHeight = 0
+    private var layoutRetries = 0
     private var pausedAtLine = -1
     private var currentLine = -1
     private var hiddenForSensitive = false
@@ -197,10 +204,12 @@ class TeleprompterService : Service() {
         showBubble(true)
 
         val view = LayoutInflater.from(this).inflate(R.layout.overlay_prompter_editor, null)
-        view.background = boxBackground()
+        view.findViewById<View>(R.id.editorPanel).background = boxBackground()
+        view.findViewById<View>(R.id.adjustPanel).background = boxBackground()
 
         val input = view.findViewById<EditText>(R.id.scriptInput)
         val estimate = view.findViewById<TextView>(R.id.estimateText)
+        input.textSize = TeleprompterPrefs.textSize(this).coerceIn(14, 34).toFloat()
 
         val initial = when {
             script.isNotBlank() -> script
@@ -237,13 +246,14 @@ class TeleprompterService : Service() {
             }
         }
 
-        view.findViewById<View>(R.id.settingsButton).setOnClickListener {
-            saveDraft(input.text.toString())
-            startActivity(
-                Intent(this, TeleprompterSettingsActivity::class.java)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            )
+        // The tune button opens speed / text size right here — it must never
+        // pull the user out into the app.
+        val adjustPanel = view.findViewById<View>(R.id.adjustPanel)
+        view.findViewById<View>(R.id.tuneButton).setOnClickListener {
+            adjustPanel.visibility =
+                if (adjustPanel.visibility == View.VISIBLE) View.GONE else View.VISIBLE
         }
+        wireAdjustPanel(view, input, estimate)
 
         view.findViewById<View>(R.id.closeEditor).setOnClickListener {
             saveDraft(input.text.toString())
@@ -281,6 +291,43 @@ class TeleprompterService : Service() {
         runCatching { windowManager.addView(view, params) }
             .onFailure { permissionProblem(); return }
         editorView = view
+    }
+
+    /** The two sliders behind the tune button: scroll speed and text size. */
+    private fun wireAdjustPanel(root: View, input: EditText, estimate: TextView) {
+        val speedSeek = root.findViewById<android.widget.SeekBar>(R.id.adjustSpeedSeek)
+        val speedValue = root.findViewById<TextView>(R.id.adjustSpeedValue)
+        val sizeSeek = root.findViewById<android.widget.SeekBar>(R.id.adjustSizeSeek)
+        val sizeValue = root.findViewById<TextView>(R.id.adjustSizeValue)
+
+        speedValue.text = getString(R.string.prompter_wpm_short, TeleprompterPrefs.speedWpm(this))
+        speedSeek.progress = (TeleprompterPrefs.speedWpm(this) - MIN_WPM).coerceIn(0, speedSeek.max)
+        speedSeek.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(bar: android.widget.SeekBar?, progress: Int, fromUser: Boolean) {
+                TeleprompterPrefs.setSpeedWpm(this@TeleprompterService, MIN_WPM + progress)
+                val wpm = TeleprompterPrefs.speedWpm(this@TeleprompterService)
+                speedValue.text = getString(R.string.prompter_wpm_short, wpm)
+                updateEstimate(estimate, input.text.toString())
+            }
+
+            override fun onStartTrackingTouch(bar: android.widget.SeekBar?) = Unit
+            override fun onStopTrackingTouch(bar: android.widget.SeekBar?) = Unit
+        })
+
+        sizeValue.text = "${TeleprompterPrefs.textSize(this)}sp"
+        sizeSeek.progress = (TeleprompterPrefs.textSize(this) - MIN_TEXT_SIZE).coerceIn(0, sizeSeek.max)
+        sizeSeek.setOnSeekBarChangeListener(object : android.widget.SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(bar: android.widget.SeekBar?, progress: Int, fromUser: Boolean) {
+                val size = MIN_TEXT_SIZE + progress
+                TeleprompterPrefs.setTextSize(this@TeleprompterService, size)
+                sizeValue.text = "${size}sp"
+                // Show the change straight away in the script box.
+                input.textSize = size.coerceIn(14, 34).toFloat()
+            }
+
+            override fun onStartTrackingTouch(bar: android.widget.SeekBar?) = Unit
+            override fun onStopTrackingTouch(bar: android.widget.SeekBar?) = Unit
+        })
     }
 
     private fun populateSavedList(container: android.widget.LinearLayout, input: EditText) {
@@ -417,9 +464,12 @@ class TeleprompterService : Service() {
             TeleprompterPrefs.lastScrollY(this).toFloat()
         } else 0f
 
+        contentHeight = 0
+        layoutRetries = 0
         state = State.PLAYING
         isPlaying = true
-        handler.post { rebuildScriptLayout(); resumeScrolling() }
+        // Measure once the window has been laid out, then start moving.
+        view.post { rebuildScriptLayout(); resumeScrolling() }
     }
 
     /** Applies the size/position settings to the script window. */
@@ -472,9 +522,27 @@ class TeleprompterService : Service() {
         text.scaleX = if (TeleprompterPrefs.mirrorText(this)) -1f else 1f
     }
 
-    /** Sets the script into the view and prepares highlight spans. */
+    /**
+     * Sets the script into the view and prepares highlight spans.
+     *
+     * The text view lives inside a fixed-height box, and a `wrap_content` child
+     * of a FrameLayout is measured with the parent's height as the maximum — so
+     * a long script would be squashed to the box height and have nothing to
+     * scroll. We measure the text unbounded and give it that exact height, so it
+     * really is taller than the box and can move.
+     */
     private fun rebuildScriptLayout() {
         val text = scriptText ?: return
+        val clip = scrollClip ?: return
+
+        val innerWidth = clip.width - clip.paddingLeft - clip.paddingRight
+        if (innerWidth <= 0) {
+            // Not laid out yet — try again on the next frame.
+            if (layoutRetries++ < 60) handler.postDelayed({ rebuildScriptLayout() }, 16L)
+            return
+        }
+        layoutRetries = 0
+
         val prepared = prepareScript(script)
         val sp = SpannableString(prepared)
         if (TeleprompterPrefs.emphasizePunctuation(this)) {
@@ -488,8 +556,21 @@ class TeleprompterService : Service() {
         spannable = sp
         appliedSpans.clear()
         text.text = sp
+
+        // Measure the full script height and pin it, so the text can extend
+        // beyond the box and actually have somewhere to scroll to.
+        text.measure(
+            View.MeasureSpec.makeMeasureSpec(innerWidth, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+        )
+        contentHeight = text.measuredHeight
+        text.layoutParams = text.layoutParams.apply { height = contentHeight }
+        text.requestLayout()
+
         currentLine = -1
+        offset = offset.coerceAtLeast(0f)
         text.translationY = -offset
+        holdUntil = 0L
     }
 
     private fun prepareScript(raw: String): String {
@@ -528,13 +609,23 @@ class TeleprompterService : Service() {
             return
         }
 
-        val distance = (text.height - clip.height + clip.paddingTop).toFloat()
-        if (distance <= 0f) {
-            finishPlayback()
+        // Wait for the first layout pass instead of treating an unmeasured
+        // script as "already finished".
+        if (contentHeight <= 0 || clip.height <= 0) {
+            text.translationY = -offset
             return
         }
 
         val seconds = TeleprompterPrefs.estimatedSeconds(this, script).coerceAtLeast(1)
+        val distance = (contentHeight - clip.height + dp(28)).toFloat()
+        if (distance <= 0f) {
+            // Short script: it all fits, so hold it on screen for the time it
+            // takes to say, then finish.
+            if (holdUntil == 0L) holdUntil = System.currentTimeMillis() + seconds * 1000L
+            if (System.currentTimeMillis() >= holdUntil) finishPlayback()
+            return
+        }
+
         val pxPerSecond = distance / seconds
         offset += pxPerSecond * dt
 
@@ -649,6 +740,7 @@ class TeleprompterService : Service() {
         currentLine = -1
         pausedAtLine = -1
         pauseUntil = 0L
+        holdUntil = 0L
         TeleprompterPrefs.setLastScrollY(this, 0)
         scriptText?.translationY = 0f
         resumeScrolling()
