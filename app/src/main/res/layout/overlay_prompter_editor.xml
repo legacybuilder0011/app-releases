@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/prompter_title"
+        android:textColor="@color/ink"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/scriptInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@null"
+        android:gravity="top|start"
+        android:hint="@string/prompter_hint"
+        android:inputType="textMultiLine|textCapSentences"
+        android:maxLines="6"
+        android:minLines="3"
+        android:scrollbars="vertical"
+        android:textColor="@color/ink"
+        android:textColorHint="@color/faint"
+        android:textSize="17sp"
+        android:lineSpacingExtra="4dp"
+        android:importantForAutofill="no" />
+
+    <TextView
+        android:id="@+id/estimateText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/muted"
+        android:textSize="12sp" />
+
+    <!-- Saved-script list, shown when "Saved" is tapped -->
+    <LinearLayout
+        android:id="@+id/savedList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/pasteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/prompter_chip"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="10dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_paste"
+                android:tint="@color/ink"
+                android:contentDescription="@string/prompter_paste" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="7dp"
+                android:text="@string/prompter_paste"
+                android:textColor="@color/ink"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/savedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/prompter_chip"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="10dp"
+            android:text="@string/prompter_saved"
+            android:textColor="@color/ink"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/settingsButton"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/prompter_chip"
+            android:padding="9dp"
+            android:src="@drawable/ic_settings"
+            android:tint="@color/ink"
+            android:contentDescription="@string/prompter_settings" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/closeEditor"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/prompter_chip"
+            android:padding="9dp"
+            android:src="@drawable/ic_close"
+            android:tint="@color/ink"
+            android:contentDescription="@string/prompter_close" />
+
+        <ImageView
+            android:id="@+id/playButton"
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/play_fab"
+            android:padding="13dp"
+            android:src="@drawable/ic_play"
+            android:contentDescription="@string/prompter_play" />
+    </LinearLayout>
+
+</LinearLayout>

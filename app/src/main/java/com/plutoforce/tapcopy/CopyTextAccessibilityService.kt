@@ -26,18 +26,33 @@ class CopyTextAccessibilityService : AccessibilityService() {
 
     companion object {
         const val ACTION_REFRESH = "com.plutoforce.tapcopy.REFRESH_BUBBLE"
+        const val ACTION_HIDE_BUBBLE = "com.plutoforce.tapcopy.HIDE_BUBBLE"
+        const val ACTION_SHOW_BUBBLE = "com.plutoforce.tapcopy.SHOW_BUBBLE"
+
+        /** How long to wait for a second tap before treating it as a single tap. */
+        private const val DOUBLE_TAP_MS = 280L
     }
 
     private lateinit var windowManager: WindowManager
     private var bubbleView: TextView? = null
     private var bubbleParams: WindowManager.LayoutParams? = null
+    private var quickActionsView: View? = null
     private val handler = Handler(Looper.getMainLooper())
     private var isCapturing = false
     private val hideRunnable = Runnable { applyIdleFade() }
 
     private val refreshReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            applyBubbleStyle()
+            when (intent?.action) {
+                // Keep the button out of the way (and out of screenshots) while
+                // the Teleprompter is playing.
+                ACTION_HIDE_BUBBLE -> bubbleView?.visibility = View.GONE
+                ACTION_SHOW_BUBBLE -> {
+                    bubbleView?.visibility = View.VISIBLE
+                    wake()
+                }
+                else -> applyBubbleStyle()
+            }
         }
     }
 
@@ -45,7 +60,10 @@ class CopyTextAccessibilityService : AccessibilityService() {
         super.onServiceConnected()
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
         showFloatingBubble()
-        val filter = IntentFilter(ACTION_REFRESH)
+        val filter = IntentFilter(ACTION_REFRESH).apply {
+            addAction(ACTION_HIDE_BUBBLE)
+            addAction(ACTION_SHOW_BUBBLE)
+        }
         if (Build.VERSION.SDK_INT >= 33) {
             registerReceiver(refreshReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
         } else {
@@ -54,12 +72,81 @@ class CopyTextAccessibilityService : AccessibilityService() {
         }
     }
 
-    override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        // Only used to let a running Teleprompter hide itself over sensitive apps.
+        if (event?.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
+            TeleprompterService.isActive
+        ) {
+            TeleprompterService.onForegroundApp(event.packageName?.toString())
+        }
+    }
+
+    /** Double tap: open the floating Teleprompter (needs the overlay permission). */
+    private fun openTeleprompter() {
+        if (!TeleprompterPrefs.enabled(this)) {
+            Toast.makeText(this, R.string.prompter_enable_first, Toast.LENGTH_LONG).show()
+            return
+        }
+        if (!android.provider.Settings.canDrawOverlays(this)) {
+            Toast.makeText(this, R.string.prompter_permission_needed, Toast.LENGTH_LONG).show()
+            return
+        }
+        startForegroundService(
+            Intent(this, TeleprompterService::class.java)
+                .setAction(TeleprompterService.ACTION_OPEN_EDITOR)
+        )
+    }
+
+    /** Long press: a small menu beside the button. */
+    private fun showQuickActions() {
+        if (quickActionsView != null) {
+            hideQuickActions()
+            return
+        }
+        val view = android.view.LayoutInflater.from(this)
+            .inflate(R.layout.overlay_quick_actions, null)
+
+        view.findViewById<View>(R.id.qaCopy).setOnClickListener {
+            hideQuickActions(); captureScreen()
+        }
+        view.findViewById<View>(R.id.qaPrompter).setOnClickListener {
+            hideQuickActions(); openTeleprompter()
+        }
+        view.findViewById<View>(R.id.qaHistory).setOnClickListener {
+            hideQuickActions()
+            startActivity(
+                Intent(this, HistoryActivity::class.java)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
+        }
+        view.findViewById<View>(R.id.qaDismiss).setOnClickListener { hideQuickActions() }
+
+        val params = WindowManager.LayoutParams(
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            PixelFormat.TRANSLUCENT
+        ).apply {
+            gravity = Gravity.TOP or Gravity.END
+            x = dp(12)
+            y = (bubbleParams?.y ?: 0) + dp(56)
+        }
+        runCatching { windowManager.addView(view, params) }
+            .onSuccess { quickActionsView = view }
+        handler.postDelayed({ hideQuickActions() }, 6000L)
+    }
+
+    private fun hideQuickActions() {
+        quickActionsView?.let { v -> runCatching { windowManager.removeView(v) } }
+        quickActionsView = null
+    }
 
     override fun onInterrupt() = Unit
 
     override fun onDestroy() {
         runCatching { unregisterReceiver(refreshReceiver) }
+        hideQuickActions()
         bubbleView?.let { view -> runCatching { windowManager.removeView(view) } }
         bubbleView = null
         super.onDestroy()
@@ -141,6 +228,13 @@ class CopyTextAccessibilityService : AccessibilityService() {
         scheduleIdleFade()
     }
 
+    /**
+     * The floating button understands three gestures:
+     *   single tap  → copy visible screen text
+     *   double tap  → open the Teleprompter
+     *   long press  → quick actions menu
+     * Dragging still moves the button.
+     */
     private inner class DragOrTapTouchListener(
         private val params: WindowManager.LayoutParams
     ) : View.OnTouchListener {
@@ -149,6 +243,17 @@ class CopyTextAccessibilityService : AccessibilityService() {
         private var initialTouchX = 0f
         private var initialTouchY = 0f
         private var downTime = 0L
+        private var awaitingSecondTap = false
+        private var longPressFired = false
+
+        private val singleTapRunnable = Runnable {
+            awaitingSecondTap = false
+            captureScreen()
+        }
+        private val longPressRunnable = Runnable {
+            longPressFired = true
+            showQuickActions()
+        }
 
         override fun onTouch(view: View, event: MotionEvent): Boolean {
             when (event.actionMasked) {
@@ -158,26 +263,47 @@ class CopyTextAccessibilityService : AccessibilityService() {
                     initialTouchX = event.rawX
                     initialTouchY = event.rawY
                     downTime = System.currentTimeMillis()
+                    longPressFired = false
                     wake()
+                    handler.postDelayed(longPressRunnable, 500L)
                     return true
                 }
 
                 MotionEvent.ACTION_MOVE -> {
-                    params.x = initialX + (event.rawX - initialTouchX).toInt()
-                    params.y = initialY + (event.rawY - initialTouchY).toInt()
-                    runCatching { windowManager.updateViewLayout(view, params) }
+                    val moved = abs(event.rawX - initialTouchX) + abs(event.rawY - initialTouchY)
+                    if (moved > dp(12)) {
+                        handler.removeCallbacks(longPressRunnable)
+                        params.x = initialX + (event.rawX - initialTouchX).toInt()
+                        params.y = initialY + (event.rawY - initialTouchY).toInt()
+                        runCatching { windowManager.updateViewLayout(view, params) }
+                    }
                     return true
                 }
 
                 MotionEvent.ACTION_UP -> {
+                    handler.removeCallbacks(longPressRunnable)
                     val moved = abs(event.rawX - initialTouchX) + abs(event.rawY - initialTouchY)
                     val duration = System.currentTimeMillis() - downTime
-                    if (moved < dp(12) && duration < 600L) {
-                        captureScreen()
-                    } else {
-                        // Remember where the user parked the button.
-                        SettingsPrefs.setBubblePos(this@CopyTextAccessibilityService, params.x, params.y)
-                        scheduleIdleFade()
+                    val wasTap = moved < dp(12) && duration < 600L && !longPressFired
+
+                    when {
+                        !wasTap && !longPressFired -> {
+                            // Remember where the user parked the button.
+                            SettingsPrefs.setBubblePos(
+                                this@CopyTextAccessibilityService, params.x, params.y
+                            )
+                            scheduleIdleFade()
+                        }
+                        wasTap && awaitingSecondTap -> {
+                            // Second tap inside the window → Teleprompter.
+                            handler.removeCallbacks(singleTapRunnable)
+                            awaitingSecondTap = false
+                            openTeleprompter()
+                        }
+                        wasTap -> {
+                            awaitingSecondTap = true
+                            handler.postDelayed(singleTapRunnable, DOUBLE_TAP_MS)
+                        }
                     }
                     return true
                 }

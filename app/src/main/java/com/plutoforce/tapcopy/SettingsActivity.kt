@@ -67,6 +67,15 @@ class SettingsActivity : Activity() {
         switch(R.id.swAutoHide, SettingsPrefs.autoHide(this)) {
             SettingsPrefs.setAutoHide(this, it); refreshBubble()
         }
+        findViewById<android.view.View>(R.id.rowTeleprompter).setOnClickListener {
+            startActivity(Intent(this, TeleprompterSettingsActivity::class.java))
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        findViewById<TextView>(R.id.valPrompter).text =
+            if (TeleprompterPrefs.enabled(this) && Settings.canDrawOverlays(this)) "On ›" else "›"
     }
 
     // 2. Capture & copy

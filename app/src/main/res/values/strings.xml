@@ -47,4 +47,146 @@
     <string name="delete">Delete</string>
     <string name="copied">Copied to clipboard</string>
     <string name="check_updates">Check for updates</string>
+
+    <!-- Teleprompter -->
+    <string name="prompter_title">Teleprompter</string>
+    <string name="prompter_subtitle">Read naturally. Record confidently.</string>
+    <string name="prompter_back">Back</string>
+    <string name="prompter_floating">Floating Teleprompter</string>
+    <string name="prompter_floating_sub">Display your script over other apps.</string>
+    <string name="prompter_status_active">Status: Active ●</string>
+    <string name="prompter_status_disabled">Status: Off</string>
+    <string name="prompter_status_needs_permission">Status: Permission needed</string>
+    <string name="prompter_allow_overlay">Allow display over other apps</string>
+    <string name="prompter_enable">Enable Floating Teleprompter</string>
+    <string name="prompter_active_tap_disable">Teleprompter is active ● (tap to turn off)</string>
+    <string name="prompter_open_now">Open Teleprompter now</string>
+    <string name="prompter_enabled_toast">Teleprompter on. Double-tap the T button anywhere.</string>
+    <string name="prompter_disabled_toast">Teleprompter turned off</string>
+    <string name="prompter_enable_first">Turn on the Teleprompter in Settings first</string>
+    <string name="prompter_permission_needed">Allow \'display over other apps\' for the Teleprompter</string>
+    <string name="prompter_overlay_blocked">Another app is blocking overlays. Close it and try again.</string>
+    <string name="prompter_open_settings_failed">Couldn\'t open that settings screen</string>
+    <string name="prompter_perm_title">Allow Floating Teleprompter</string>
+    <string name="prompter_perm_body">TapCopy needs permission to display your script over your camera and other apps.\n\nTapCopy will:\n✓ Show only the script you choose\n✓ Start only when you activate it\n✓ Never record your screen\n✓ Let you disable the feature anytime</string>
+    <string name="prompter_not_now">Not now</string>
+    <string name="prompter_continue">Continue</string>
+    <string name="prompter_promise">Double-tap. Paste. Press Play. Speak confidently anywhere.</string>
+
+    <string name="prompter_hint">Paste or type your script here…</string>
+    <string name="prompter_paste">Paste</string>
+    <string name="prompter_saved">Saved</string>
+    <string name="prompter_no_saved">No saved scripts yet.</string>
+    <string name="prompter_settings">Teleprompter settings</string>
+    <string name="prompter_play">Play</string>
+    <string name="prompter_close">Close</string>
+    <string name="prompter_close_confirm">Close the Teleprompter?</string>
+    <string name="prompter_paused">Paused</string>
+    <string name="prompter_finished">Finished — tap to read again</string>
+    <string name="prompter_restart">Restart</string>
+    <string name="prompter_restart_again">Tap restart again to start from the beginning</string>
+    <string name="prompter_speed">Speed</string>
+    <string name="prompter_edit">Edit script</string>
+    <string name="prompter_estimate">%1$d words · about %2$s</string>
+    <string name="prompter_wpm_short">%1$d WPM</string>
+    <string name="prompter_channel">TapCopy Teleprompter</string>
+    <string name="prompter_notification_title">TapCopy Teleprompter is active</string>
+    <string name="prompter_notification_text">Tap the script to pause · long-press for controls</string>
+    <string name="prompter_stop">Stop</string>
+    <string name="prompter_start_blocked">Android blocked starting the Teleprompter just now. Open TapCopy and try again.</string>
+    <string name="prompter_preview_text">If you\u2019ve been filming your reels\nand fumbling your words, this is\nfor you.</string>
+
+    <string name="qa_copy">Copy visible text</string>
+    <string name="qa_prompter">Open Teleprompter</string>
+    <string name="qa_history">History</string>
+    <string name="qa_single_tap">Single tap</string>
+    <string name="qa_double_tap">Double tap</string>
+    <string name="qa_long_press">Long press</string>
+    <string name="qa_long_press_sub">Open quick actions</string>
+
+    <string name="sec_quick_access">QUICK ACCESS</string>
+    <string name="sec_script">SCRIPT</string>
+    <string name="sec_preview">PREVIEW</string>
+    <string name="sec_text">TEXT APPEARANCE</string>
+    <string name="sec_scrolling">SCROLLING</string>
+    <string name="sec_playback">PLAYBACK</string>
+    <string name="sec_position">POSITION AND SIZE</string>
+    <string name="sec_reading">READING ASSISTANCE</string>
+    <string name="sec_privacy">PRIVACY</string>
+
+    <string name="set_btn_size">Floating button size</string>
+    <string name="set_btn_opacity">Floating button opacity</string>
+    <string name="set_auto_hide">Auto-hide when idle</string>
+    <string name="set_auto_hide_sub">Fades and shrinks instead of disappearing</string>
+    <string name="set_reset_btn_pos">Reset button position</string>
+    <string name="set_btn_pos_reset">Floating button position reset</string>
+
+    <string name="set_use_last_copied">Use last copied text automatically</string>
+    <string name="set_use_last_copied_sub">Your latest copy is already in the editor</string>
+    <string name="set_remember_unfinished">Remember unfinished script</string>
+    <string name="set_remember_unfinished_sub">Keeps your script and reading position</string>
+    <string name="set_save_history">Save scripts to history</string>
+    <string name="set_clear_after">Clear script after finishing</string>
+    <string name="set_saved_scripts">Saved scripts</string>
+    <string name="set_saved_scripts_count">%1$d saved</string>
+
+    <string name="set_text_size">Text size</string>
+    <string name="set_line_spacing">Line spacing</string>
+    <string name="set_alignment">Text alignment</string>
+    <string name="set_highlight">Current-line highlight</string>
+    <string name="set_dim_previous">Dim previous lines</string>
+    <string name="set_bg_opacity">Background opacity</string>
+    <string name="set_box_width">Text-box width</string>
+    <string name="set_box_height">Text-box height</string>
+    <string name="set_mirror">Mirror text</string>
+    <string name="set_mirror_sub">For a mirror or teleprompter rig</string>
+
+    <string name="set_speed">Default speed</string>
+    <string name="set_speed_hint">%1$d words per minute</string>
+    <string name="set_countdown">Countdown before recording</string>
+    <string name="set_pause_paragraphs">Pause at paragraphs</string>
+    <string name="set_paragraph_pause">Paragraph pause</string>
+    <string name="set_loop">Loop script</string>
+    <string name="set_start_last">Start from last position</string>
+
+    <string name="set_hide_controls">Hide all controls during playback</string>
+    <string name="set_hide_controls_sub">Only the moving script stays on screen</string>
+    <string name="set_tap_pause">Tap script to pause or resume</string>
+    <string name="set_longpress_controls">Long press to show controls</string>
+    <string name="set_drag_paused">Drag script while paused</string>
+    <string name="set_keep_awake">Keep screen awake</string>
+    <string name="set_confirm_restart">Restart confirmation</string>
+
+    <string name="set_default_position">Default position</string>
+    <string name="set_default_position_sub">Keep it near the camera for eye contact</string>
+    <string name="set_allow_drag">Allow dragging</string>
+    <string name="set_remember_position">Remember position</string>
+    <string name="set_remember_position_sub">Saved separately for portrait and landscape</string>
+    <string name="set_reset_position">Reset position</string>
+    <string name="set_position_reset">Script position reset</string>
+
+    <string name="set_fewer_words">Show fewer words per line</string>
+    <string name="set_dyslexia">Dyslexia-friendly spacing</string>
+    <string name="set_dyslexia_sub">Bigger text, more spacing, fewer words per line</string>
+    <string name="set_emphasize_punct">Emphasize punctuation</string>
+    <string name="set_auto_paragraphs">Automatic paragraph breaks</string>
+
+    <string name="set_keep_device">Keep scripts on this device</string>
+    <string name="set_keep_device_sub">Scripts never leave your phone</string>
+    <string name="set_keep_device_locked">Scripts always stay on your device.</string>
+    <string name="set_auto_delete_drafts">Automatically delete drafts</string>
+    <string name="set_hide_lock">Hide Teleprompter on lock screen</string>
+    <string name="set_hide_sensitive">Hide over sensitive apps</string>
+    <string name="set_hide_sensitive_sub">Hides over banking and password apps</string>
+
+    <string name="script_rename">Rename</string>
+    <string name="script_duplicate">Duplicate</string>
+    <string name="script_duplicated">Script duplicated</string>
+    <string name="script_favourite">Mark as favourite</string>
+    <string name="script_unfavourite">Remove favourite</string>
+    <string name="script_delete">Delete</string>
+    <string name="script_delete_confirm">Delete \u201c%1$s\u201d?</string>
+
+    <string name="prompter_settings_row">Teleprompter</string>
+    <string name="prompter_settings_row_sub">Read your script over any app</string>
 </resources>

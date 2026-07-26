@@ -1,0 +1,556 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="18dp">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/backButton"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_back"
+                android:tint="@color/ink"
+                android:contentDescription="@string/prompter_back" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:text="@string/prompter_title"
+                android:textColor="@color/ink"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="@string/prompter_subtitle"
+            android:textColor="@color/muted"
+            android:textSize="14sp" />
+
+        <!-- STATUS CARD -->
+        <LinearLayout style="@style/SettingsCard">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/prompter_floating"
+                android:textColor="@color/ink"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:text="@string/prompter_floating_sub"
+                android:textColor="@color/muted"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/statusLine"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/chip_bg"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="7dp"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/enableButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/button_primary"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/testButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/button_secondary"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="@string/prompter_open_now"
+                android:textColor="@color/ink"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <!-- QUICK ACCESS -->
+        <LinearLayout style="@style/SettingsCard">
+            <TextView style="@style/SectionLabel" android:text="@string/sec_quick_access" />
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="👆" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/qa_single_tap" />
+                    <TextView style="@style/SSub" android:text="@string/qa_copy" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="✌️" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/qa_double_tap" />
+                    <TextView style="@style/SSub" android:text="@string/qa_prompter" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="⏱" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/qa_long_press" />
+                    <TextView style="@style/SSub" android:text="@string/qa_long_press_sub" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/card_stroke" />
+
+            <LinearLayout android:id="@+id/rowBtnSize" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="⛶" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_btn_size" />
+                </LinearLayout>
+                <TextView android:id="@+id/valBtnSize" style="@style/SValue" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowBtnOpacity" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="◐" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_btn_opacity" />
+                </LinearLayout>
+                <TextView android:id="@+id/valBtnOpacity" style="@style/SValue" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🫥" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_auto_hide" />
+                    <TextView style="@style/SSub" android:text="@string/set_auto_hide_sub" />
+                </LinearLayout>
+                <Switch android:id="@+id/swAutoHide" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowResetButtonPos" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="↺" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_reset_btn_pos" />
+                </LinearLayout>
+                <TextView style="@style/SValue" android:text="›" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- SCRIPT -->
+        <LinearLayout style="@style/SettingsCard">
+            <TextView style="@style/SectionLabel" android:text="@string/sec_script" />
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="📋" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_use_last_copied" />
+                    <TextView style="@style/SSub" android:text="@string/set_use_last_copied_sub" />
+                </LinearLayout>
+                <Switch android:id="@+id/swUseLastCopied" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="💾" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_remember_unfinished" />
+                    <TextView style="@style/SSub" android:text="@string/set_remember_unfinished_sub" />
+                </LinearLayout>
+                <Switch android:id="@+id/swRememberUnfinished" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🗂" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_save_history" />
+                </LinearLayout>
+                <Switch android:id="@+id/swSaveHistory" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🧹" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_clear_after" />
+                </LinearLayout>
+                <Switch android:id="@+id/swClearAfter" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowScripts" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="📚" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_saved_scripts" />
+                    <TextView android:id="@+id/valScriptCount" style="@style/SSub" />
+                </LinearLayout>
+                <TextView style="@style/SValue" android:text="›" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- PREVIEW -->
+        <LinearLayout style="@style/SettingsCard">
+            <TextView style="@style/SectionLabel" android:text="@string/sec_preview" />
+
+            <FrameLayout
+                android:id="@+id/previewBox"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:layout_marginTop="4dp">
+
+                <TextView
+                    android:id="@+id/previewText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:padding="12dp"
+                    android:text="@string/prompter_preview_text"
+                    android:textColor="#FFFFFF" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- TEXT APPEARANCE -->
+        <LinearLayout style="@style/SettingsCard">
+            <TextView style="@style/SectionLabel" android:text="@string/sec_text" />
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🔠" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_text_size" />
+                    <SeekBar android:id="@+id/seekTextSize" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="40" />
+                </LinearLayout>
+                <TextView android:id="@+id/valTextSize" style="@style/SValue" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowLineSpacing" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="↕" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_line_spacing" />
+                </LinearLayout>
+                <TextView android:id="@+id/valLineSpacing" style="@style/SValue" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowAlignment" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="⬅" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_alignment" />
+                </LinearLayout>
+                <TextView android:id="@+id/valAlignment" style="@style/SValue" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="✨" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_highlight" />
+                </LinearLayout>
+                <Switch android:id="@+id/swHighlight" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🌒" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_dim_previous" />
+                </LinearLayout>
+                <Switch android:id="@+id/swDimPrevious" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🎛" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_bg_opacity" />
+                    <SeekBar android:id="@+id/seekOpacity" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="100" />
+                </LinearLayout>
+                <TextView android:id="@+id/valOpacity" style="@style/SValue" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="↔" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_box_width" />
+                    <SeekBar android:id="@+id/seekBoxWidth" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="100" />
+                </LinearLayout>
+                <TextView android:id="@+id/valBoxWidth" style="@style/SValue" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowBoxHeight" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="⬍" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_box_height" />
+                </LinearLayout>
+                <TextView android:id="@+id/valBoxHeight" style="@style/SValue" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🪞" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_mirror" />
+                    <TextView style="@style/SSub" android:text="@string/set_mirror_sub" />
+                </LinearLayout>
+                <Switch android:id="@+id/swMirror" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- SCROLLING -->
+        <LinearLayout style="@style/SettingsCard">
+            <TextView style="@style/SectionLabel" android:text="@string/sec_scrolling" />
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🏃" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_speed" />
+                    <SeekBar android:id="@+id/seekSpeed" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="200" />
+                    <TextView android:id="@+id/valSpeedHint" style="@style/SSub" />
+                </LinearLayout>
+                <TextView android:id="@+id/valSpeed" style="@style/SValue" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowCountdown" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="3️⃣" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_countdown" />
+                </LinearLayout>
+                <TextView android:id="@+id/valCountdown" style="@style/SValue" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="⏸" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_pause_paragraphs" />
+                </LinearLayout>
+                <Switch android:id="@+id/swPauseParagraphs" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowParagraphPause" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="⏳" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_paragraph_pause" />
+                </LinearLayout>
+                <TextView android:id="@+id/valParagraphPause" style="@style/SValue" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🔁" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_loop" />
+                </LinearLayout>
+                <Switch android:id="@+id/swLoop" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="📍" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_start_last" />
+                </LinearLayout>
+                <Switch android:id="@+id/swStartLast" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- PLAYBACK -->
+        <LinearLayout style="@style/SettingsCard">
+            <TextView style="@style/SectionLabel" android:text="@string/sec_playback" />
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🙈" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_hide_controls" />
+                    <TextView style="@style/SSub" android:text="@string/set_hide_controls_sub" />
+                </LinearLayout>
+                <Switch android:id="@+id/swHideControls" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="👉" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_tap_pause" />
+                </LinearLayout>
+                <Switch android:id="@+id/swTapPause" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🎚" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_longpress_controls" />
+                </LinearLayout>
+                <Switch android:id="@+id/swLongPressControls" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="✋" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_drag_paused" />
+                </LinearLayout>
+                <Switch android:id="@+id/swDragPaused" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="☀️" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_keep_awake" />
+                </LinearLayout>
+                <Switch android:id="@+id/swKeepAwake" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="⚠️" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_confirm_restart" />
+                </LinearLayout>
+                <Switch android:id="@+id/swConfirmRestart" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- POSITION AND SIZE -->
+        <LinearLayout style="@style/SettingsCard">
+            <TextView style="@style/SectionLabel" android:text="@string/sec_position" />
+
+            <LinearLayout android:id="@+id/rowDefaultPosition" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="⬆" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_default_position" />
+                    <TextView style="@style/SSub" android:text="@string/set_default_position_sub" />
+                </LinearLayout>
+                <TextView android:id="@+id/valDefaultPosition" style="@style/SValue" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🖐" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_allow_drag" />
+                </LinearLayout>
+                <Switch android:id="@+id/swAllowDrag" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🧠" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_remember_position" />
+                    <TextView style="@style/SSub" android:text="@string/set_remember_position_sub" />
+                </LinearLayout>
+                <Switch android:id="@+id/swRememberPosition" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowResetPosition" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="↺" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_reset_position" />
+                </LinearLayout>
+                <TextView style="@style/SValue" android:text="›" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- READING ASSISTANCE -->
+        <LinearLayout style="@style/SettingsCard">
+            <TextView style="@style/SectionLabel" android:text="@string/sec_reading" />
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="📏" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_fewer_words" />
+                </LinearLayout>
+                <Switch android:id="@+id/swFewerWords" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🧩" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_dyslexia" />
+                    <TextView style="@style/SSub" android:text="@string/set_dyslexia_sub" />
+                </LinearLayout>
+                <Switch android:id="@+id/swDyslexia" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="❗" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_emphasize_punct" />
+                </LinearLayout>
+                <Switch android:id="@+id/swEmphasizePunct" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="¶" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_auto_paragraphs" />
+                </LinearLayout>
+                <Switch android:id="@+id/swAutoParagraphs" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- PRIVACY -->
+        <LinearLayout style="@style/SettingsCard">
+            <TextView style="@style/SectionLabel" android:text="@string/sec_privacy" />
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🔒" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_keep_device" />
+                    <TextView style="@style/SSub" android:text="@string/set_keep_device_sub" />
+                </LinearLayout>
+                <Switch android:id="@+id/swKeepDevice" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/rowDraftDelete" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="🗑" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_auto_delete_drafts" />
+                </LinearLayout>
+                <TextView android:id="@+id/valDraftDelete" style="@style/SValue" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🔐" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_hide_lock" />
+                </LinearLayout>
+                <Switch android:id="@+id/swHideLock" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/SRow" android:clickable="false">
+                <TextView style="@style/SEmoji" android:text="🏦" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/set_hide_sensitive" />
+                    <TextView style="@style/SSub" android:text="@string/set_hide_sensitive_sub" />
+                </LinearLayout>
+                <Switch android:id="@+id/swHideSensitive" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:text="@string/prompter_promise"
+            android:textColor="@color/faint"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+</ScrollView>

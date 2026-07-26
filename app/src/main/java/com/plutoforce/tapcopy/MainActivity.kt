@@ -58,6 +58,9 @@ class MainActivity : Activity() {
         bind(R.id.upgradeButton, proSoon)
         bind(R.id.proBadge, proSoon)
         bind(R.id.navHome) { /* already home */ }
+        bind(R.id.cardPrompter) {
+            startActivity(Intent(this, TeleprompterSettingsActivity::class.java))
+        }
         bind(R.id.fabT) {
             toast("Tap the floating T over other apps to capture text.")
         }
@@ -66,6 +69,10 @@ class MainActivity : Activity() {
     override fun onResume() {
         super.onResume()
         updateStatus()
+        findViewById<TextView>(R.id.prompterStatus).text =
+            if (TeleprompterPrefs.enabled(this) &&
+                android.provider.Settings.canDrawOverlays(this)
+            ) "On ›" else "Set up ›"
         if (!checkedThisLaunch) {
             checkedThisLaunch = true
             checkForUpdate(userInitiated = false)

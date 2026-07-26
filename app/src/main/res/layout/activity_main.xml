@@ -196,6 +196,36 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/cardPrompter"
+                    style="@style/SettingsCard"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView style="@style/TileIcon" android:src="@drawable/ic_teleprompter" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/prompter_title"
+                            android:textColor="@color/ink"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView style="@style/SSub" android:text="@string/prompter_subtitle" />
+                    </LinearLayout>
+
+                    <TextView android:id="@+id/prompterStatus" style="@style/SValue" />
+                </LinearLayout>
+
                 <!-- Upgrade banner -->
                 <LinearLayout
                     android:layout_width="match_parent"

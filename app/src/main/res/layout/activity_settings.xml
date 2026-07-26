@@ -89,6 +89,17 @@
                 </LinearLayout>
                 <Switch android:id="@+id/swAutoHide" android:layout_width="wrap_content" android:layout_height="wrap_content" />
             </LinearLayout>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/card_stroke" />
+
+            <LinearLayout android:id="@+id/rowTeleprompter" style="@style/SRow">
+                <TextView style="@style/SEmoji" android:text="🎬" />
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                    <TextView style="@style/STitle" android:text="@string/prompter_settings_row" />
+                    <TextView style="@style/SSub" android:text="@string/prompter_settings_row_sub" />
+                </LinearLayout>
+                <TextView android:id="@+id/valPrompter" style="@style/SValue" android:text="›" />
+            </LinearLayout>
         </LinearLayout>
 
         <!-- 2. CAPTURE & COPY -->

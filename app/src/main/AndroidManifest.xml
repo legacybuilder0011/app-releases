@@ -6,6 +6,14 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
+    <!-- The Teleprompter draws the script over other apps. This is the narrow
+         overlay permission, granted by the user in Android settings — the
+         accessibility service is NOT used for the Teleprompter. -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_tap_copy"
@@ -32,6 +40,21 @@
         <activity
             android:name=".SettingsActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".TeleprompterSettingsActivity"
+            android:exported="false" />
+
+        <!-- Keeps the script scrolling over other apps. Started only from a
+             visible user action (enabling it, or double-tapping the button). -->
+        <service
+            android:name=".TeleprompterService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Displays the user's own script as a floating teleprompter overlay while they record in another app." />
+        </service>
 
         <provider
             android:name="androidx.core.content.FileProvider"
