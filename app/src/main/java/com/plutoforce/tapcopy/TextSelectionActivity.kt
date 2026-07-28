@@ -131,17 +131,21 @@ class TextSelectionActivity : Activity() {
             .addOnSuccessListener { result ->
                 recognizedText = result.text.trim()
                 textReady = recognizedText.isNotBlank()
+                // Skip screen furniture (like counts, Search, Add comment…) so the
+                // highlights point at text worth copying instead of everything.
                 val regions = if (SettingsPrefs.selectionMode(this) == "line") {
                     result.textBlocks.flatMap { it.lines }.mapNotNull { line ->
                         val box = line.boundingBox ?: return@mapNotNull null
                         val text = line.text.trim()
-                        if (text.isBlank()) null else TextOverlayView.TextRegion(text, box)
+                        if (text.isBlank() || TextExtractor.isNoise(text)) null
+                        else TextOverlayView.TextRegion(text, box)
                     }
                 } else {
                     result.textBlocks.mapNotNull { block ->
                         val box = block.boundingBox ?: return@mapNotNull null
                         val text = block.text.trim()
-                        if (text.isBlank()) null else TextOverlayView.TextRegion(text, box)
+                        if (text.isBlank() || TextExtractor.isNoise(text)) null
+                        else TextOverlayView.TextRegion(text, box)
                     }
                 }
                 overlay.setRegions(regions)

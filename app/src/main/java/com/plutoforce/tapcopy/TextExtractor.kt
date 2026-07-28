@@ -44,6 +44,40 @@ object TextExtractor {
     private fun distinctMatches(regex: Regex, text: String): List<String> =
         regex.findAll(text).map { it.value.trim() }.filter { it.isNotBlank() }.distinct().toList()
 
+    // Search boxes, tab bars and the like — never worth drawing a box around.
+    private val NOISE_PHRASES = setOf(
+        "find related content", "add comment...", "add comment…", "add comment",
+        "search", "less", "more", "see more", "see less", "follow", "following",
+        "add yours", "send message", "view profile", "share", "save", "report",
+        "log in", "sign up", "watch again", "swipe up", "tap to unmute"
+    )
+
+    private val COUNT_ONLY = Regex("^\\d+([.,]\\d+)?\\s*[kmb]?$", RegexOption.IGNORE_CASE)
+    private val CLOCK = Regex("^\\d{1,2}:\\d{2}(\\s*[ap]m)?$", RegexOption.IGNORE_CASE)
+    private val ISO_DATE = Regex("^\\d{4}-\\d{2}-\\d{2}$")
+
+    /**
+     * True for screen furniture — like counts, clocks, search fields, button
+     * labels. These are highlighted as text but nobody wants to copy them, so
+     * they only get in the way of picking the caption.
+     */
+    fun isNoise(text: String): Boolean {
+        val line = text.trim()
+        if (line.length <= 1) return true
+        val lower = line.lowercase()
+        return when {
+            lower in NOISE_PHRASES -> true
+            lower in BUTTON_WORDS -> true
+            COUNT_ONLY.matches(line) -> true
+            CLOCK.matches(line) -> true
+            ISO_DATE.matches(line) -> true
+            REL_DATE.matches(line) -> true
+            // Pure punctuation / emoji-only fragments.
+            line.none { it.isLetterOrDigit() } -> true
+            else -> false
+        }
+    }
+
     /** Light tidy: trim lines, collapse repeated spaces, drop blank lines. */
     fun tidy(text: String): String =
         text.lines()

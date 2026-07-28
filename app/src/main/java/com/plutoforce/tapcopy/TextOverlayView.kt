@@ -12,6 +12,7 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import kotlin.math.abs
 
 class TextOverlayView @JvmOverloads constructor(
     context: Context,
@@ -93,28 +94,61 @@ class TextOverlayView @JvmOverloads constructor(
             .sortedWith(compareBy({ it.box.top }, { it.box.left }))
             .joinToString("\n") { it.text }
 
-    /**
-     * Best guess at the caption: the text block with the most words (captions are
-     * usually the longest run of prose on screen). Empty if nothing qualifies.
-     */
+    /** The caption's text: every block in the caption cluster, in reading order. */
     fun bestCaptionText(): String {
-        val best = regions.maxByOrNull { wordCount(it.text) } ?: return ""
-        return if (wordCount(best.text) >= 3) best.text else ""
+        val indices = captionIndices()
+        if (indices.isEmpty()) return ""
+        return indices.map { regions[it] }
+            .sortedWith(compareBy({ it.box.top }, { it.box.left }))
+            .joinToString("\n") { it.text }
     }
 
     private fun wordCount(s: String): Int =
         s.trim().split(Regex("\\s+")).count { it.isNotBlank() }
 
-    /** Selects the caption block (most words) if one qualifies. */
-    fun selectCaption() {
-        if (regions.isEmpty()) return
-        val idx = regions.indices.maxByOrNull { wordCount(regions[it].text) } ?: return
-        if (wordCount(regions[idx].text) >= 3) {
-            selected.clear()
-            selected.add(idx)
-            invalidate()
-            onSelectionChanged?.invoke(selected.size)
+    /**
+     * Finds the caption rather than the biggest block of text on screen.
+     *
+     * On TikTok/Instagram the caption is left-aligned against the edge and sits
+     * in the lower part of the screen, while text burned into the video is
+     * usually centred and higher up. So we keep blocks that hug the left edge
+     * below the midpoint, drop obvious screen furniture, and take the run of
+     * them — a caption is several paragraphs, not one.
+     */
+    private fun captionIndices(): List<Int> {
+        val bitmap = screenshot ?: return emptyList()
+        val leftLimit = bitmap.width * 0.25f
+        val topLimit = bitmap.height * 0.35f
+
+        val candidates = regions.indices.filter { i ->
+            val region = regions[i]
+            !TextExtractor.isNoise(region.text) &&
+                region.box.left <= leftLimit &&
+                region.box.top >= topLimit
         }
+        if (candidates.isEmpty()) return emptyList()
+
+        // Keep the blocks that share the caption's left margin: burned-in text
+        // that happens to reach the left edge sits at a different indent.
+        val ordered = candidates.sortedBy { regions[it].box.top }
+        val margin = ordered.map { regions[it].box.left.toFloat() }.sorted()
+            .let { it[it.size / 2] }
+        val tolerance = bitmap.width * 0.06f
+        val aligned = ordered.filter { abs(regions[it].box.left - margin) <= tolerance }
+
+        // Ignore a stray word — a caption has something to say.
+        val words = aligned.sumOf { wordCount(regions[it].text) }
+        return if (words >= 3) aligned else emptyList()
+    }
+
+    /** Ticks the whole caption, ready to copy. */
+    fun selectCaption() {
+        val indices = captionIndices()
+        if (indices.isEmpty()) return
+        selected.clear()
+        selected.addAll(indices)
+        invalidate()
+        onSelectionChanged?.invoke(selected.size)
     }
 
     override fun onDraw(canvas: Canvas) {
