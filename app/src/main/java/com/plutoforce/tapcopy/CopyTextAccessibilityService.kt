@@ -103,8 +103,10 @@ class CopyTextAccessibilityService : AccessibilityService() {
             hideQuickActions()
             return
         }
-        val view = android.view.LayoutInflater.from(this)
+        val themed = AppTheme.wrap(this, forceDark = true)
+        val view = android.view.LayoutInflater.from(themed)
             .inflate(R.layout.overlay_quick_actions, null)
+        AppTheme.applyAccent(view, this)
 
         view.findViewById<View>(R.id.qaCopy).setOnClickListener {
             hideQuickActions(); captureScreen()
@@ -165,6 +167,8 @@ class CopyTextAccessibilityService : AccessibilityService() {
             elevation = dp(8).toFloat()
             contentDescription = "Tap to copy visible screen text"
         }
+        // The button carries the app's accent colour wherever it floats.
+        AppTheme.applyAccent(bubble, this)
 
         val params = WindowManager.LayoutParams(
             sizePx,
@@ -208,6 +212,8 @@ class CopyTextAccessibilityService : AccessibilityService() {
         positionParams(params, sizePx)
         view.textSize = SettingsPrefs.buttonSizeDp(this) * 0.4f
         view.alpha = baseAlpha()
+        view.setBackgroundResource(R.drawable.bubble_background)
+        AppTheme.applyAccent(view, this)
         runCatching { windowManager.updateViewLayout(view, params) }
         scheduleIdleFade()
     }

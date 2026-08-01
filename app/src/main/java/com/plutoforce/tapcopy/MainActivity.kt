@@ -1,7 +1,6 @@
 package com.plutoforce.tapcopy
 
 import android.accessibilityservice.AccessibilityServiceInfo
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
@@ -14,7 +13,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 
-class MainActivity : Activity() {
+class MainActivity : ThemedActivity() {
 
     private lateinit var statusText: TextView
     private lateinit var enableButton: Button

@@ -1,6 +1,5 @@
 package com.plutoforce.tapcopy
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.net.Uri
@@ -14,12 +13,21 @@ import android.widget.TextView
 import android.widget.Toast
 import java.io.File
 
-/** Full settings screen. Every control here works on-device; a few advanced
- *  items (translation, extra OCR languages, light theme, accent, text size)
- *  show "coming soon". */
-class SettingsActivity : Activity() {
+/** Full settings screen. Everything here does something: capture behaviour and
+ *  privacy run on-device, appearance rebuilds the screen on the spot, and the
+ *  translation language feeds the AI Tools. */
+class SettingsActivity : ThemedActivity() {
 
     private val mainHandler = Handler(Looper.getMainLooper())
+
+    private companion object {
+        val TEXT_SIZES = listOf(
+            "Small" to 0.9f,
+            "Default" to 1.0f,
+            "Large" to 1.15f,
+            "Extra large" to 1.3f,
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,11 +116,40 @@ class SettingsActivity : Activity() {
 
     // 3. OCR & language
     private fun wireOcrLanguage() {
-        comingSoon(R.id.rowRecogLang)
-        comingSoon(R.id.rowTransLang)
+        // The recogniser bundled in the app reads every Latin-script language
+        // (English, Pidgin, Yoruba, Igbo, Hausa, French, Spanish and the rest)
+        // with one model, so there is nothing to choose between — saying so
+        // beats a picker that changes nothing.
+        findViewById<android.view.View>(R.id.rowRecogLang).setOnClickListener {
+            info(
+                "Text recognition language",
+                "TapCopy reads Latin script, which covers English, Pidgin, Yoruba, Igbo, " +
+                    "Hausa, French, Spanish, Portuguese, German, Swahili and every other " +
+                    "language written in the same alphabet — one model handles them all, " +
+                    "on your device.\n\nChinese, Japanese, Korean and Devanagari need their " +
+                    "own models. Ask and I'll add them, at the cost of a bigger app download."
+            )
+        }
+
+        val valTrans = findViewById<TextView>(R.id.valTransLang)
+        valTrans.text = translateLabel()
+        findViewById<android.view.View>(R.id.rowTransLang).setOnClickListener {
+            val labels = arrayOf("Ask me each time") + AiClient.LANGUAGES.toTypedArray()
+            val values = arrayOf("") + AiClient.LANGUAGES.toTypedArray()
+            choice("Translate to", labels, values, SettingsPrefs.translateLang(this)) {
+                SettingsPrefs.setTranslateLang(this, it)
+                valTrans.text = translateLabel()
+            }
+        }
+
         switch(R.id.swImproveCleanup, SettingsPrefs.improveCleanup(this)) {
             SettingsPrefs.setImproveCleanup(this, it)
         }
+    }
+
+    private fun translateLabel(): String {
+        val lang = SettingsPrefs.translateLang(this)
+        return if (lang.isBlank()) "Ask me  ›" else "$lang  ›"
     }
 
     // 4. Privacy & storage
@@ -156,16 +193,42 @@ class SettingsActivity : Activity() {
         switch(R.id.swSound, SettingsPrefs.soundOnCopy(this)) { SettingsPrefs.setSoundOnCopy(this, it) }
     }
 
-    // 6. Appearance (all coming soon — app ships dark)
+    // 6. Appearance
     private fun wireAppearance() {
         val dark = findViewById<Switch>(R.id.swDarkMode)
-        dark.isChecked = true
+        dark.isChecked = SettingsPrefs.darkMode(this)
         dark.setOnCheckedChangeListener { _, checked ->
-            if (!checked) { dark.isChecked = true; toast("Light mode is coming soon.") }
+            SettingsPrefs.setDarkMode(this, checked)
+            refreshBubble()
+            recreate()
         }
-        comingSoon(R.id.rowAccent)
-        comingSoon(R.id.rowTextSize)
+
+        val valAccent = findViewById<TextView>(R.id.valAccent)
+        valAccent.text = "${AppTheme.accent(this).label}  ›"
+        findViewById<android.view.View>(R.id.rowAccent).setOnClickListener {
+            val labels = AppTheme.ACCENTS.map { it.label }.toTypedArray()
+            val values = AppTheme.ACCENTS.map { it.key }.toTypedArray()
+            choice("Accent color", labels, values, SettingsPrefs.accent(this)) {
+                SettingsPrefs.setAccent(this, it)
+                refreshBubble()
+                recreate()
+            }
+        }
+
+        val valTextSize = findViewById<TextView>(R.id.valTextSize)
+        valTextSize.text = "${textSizeLabel(SettingsPrefs.textScale(this))}  ›"
+        findViewById<android.view.View>(R.id.rowTextSize).setOnClickListener {
+            val labels = TEXT_SIZES.map { it.first }.toTypedArray()
+            val values = TEXT_SIZES.map { it.second.toString() }.toTypedArray()
+            choice("Text size", labels, values, SettingsPrefs.textScale(this).toString()) {
+                SettingsPrefs.setTextScale(this, it.toFloat())
+                recreate()
+            }
+        }
     }
+
+    private fun textSizeLabel(scale: Float): String =
+        TEXT_SIZES.firstOrNull { it.second == scale }?.first ?: "Default"
 
     // 7. Help & about
     private fun wireHelpAbout() {
@@ -200,10 +263,6 @@ class SettingsActivity : Activity() {
         val sw = findViewById<Switch>(id)
         sw.isChecked = initial
         sw.setOnCheckedChangeListener { _, checked -> onChange(checked) }
-    }
-
-    private fun comingSoon(rowId: Int) {
-        findViewById<android.view.View>(rowId).setOnClickListener { toast("Coming soon") }
     }
 
     private fun choice(

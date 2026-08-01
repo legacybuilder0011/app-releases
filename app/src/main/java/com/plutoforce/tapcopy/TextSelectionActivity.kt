@@ -1,8 +1,8 @@
 package com.plutoforce.tapcopy
 
-import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.AudioManager
 import android.media.ToneGenerator
@@ -20,7 +20,9 @@ import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.io.File
 
-class TextSelectionActivity : Activity() {
+class TextSelectionActivity : ThemedActivity() {
+
+    override val forceDark: Boolean get() = true
 
     companion object {
         const val EXTRA_SCREENSHOT_PATH = "screenshot_path"
@@ -104,6 +106,8 @@ class TextSelectionActivity : Activity() {
         btnPhones.setOnClickListener {
             copyExtracted("phone numbers") { TextExtractor.phones(it).joinToString("\n") }
         }
+        findViewById<Button>(R.id.btnTranslate).setOnClickListener { handToAi(AiClient.TRANSLATE) }
+        findViewById<Button>(R.id.btnAi).setOnClickListener { handToAi(null) }
 
         screenshotPath = intent.getStringExtra(EXTRA_SCREENSHOT_PATH)
         val path = screenshotPath
@@ -222,6 +226,25 @@ class TextSelectionActivity : Activity() {
             return
         }
         copyAndReturn(text)
+    }
+
+    /**
+     * Sends what's on screen to AI Tools. The sheet is a frozen screenshot over
+     * another app, so the work belongs on a real screen where it can show
+     * progress and let the answer be copied — not behind a chip that blocks.
+     */
+    private fun handToAi(tool: String?) {
+        val text = sourceText()
+        if (text.isBlank()) {
+            toast("No readable text yet")
+            return
+        }
+        val intent = Intent(this, AiToolsActivity::class.java)
+            .putExtra(Intent.EXTRA_TEXT, text)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (tool != null) intent.putExtra(AiToolsActivity.EXTRA_TOOL, tool)
+        startActivity(intent)
+        closeAndCleanUp()
     }
 
     /** Selected blocks if any are ticked, otherwise the whole screen's text. */

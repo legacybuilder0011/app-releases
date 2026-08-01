@@ -155,7 +155,7 @@
                     <TextView style="@style/STitle" android:text="Text recognition language" />
                     <TextView style="@style/SSub" android:text="Language used to recognize text" />
                 </LinearLayout>
-                <TextView style="@style/SValue" android:text="Latin  ›" />
+                <TextView android:id="@+id/valRecogLang" style="@style/SValue" android:text="Latin  ›" />
             </LinearLayout>
 
             <LinearLayout android:id="@+id/rowTransLang" style="@style/SRow">
@@ -164,7 +164,7 @@
                     <TextView style="@style/STitle" android:text="Translation language" />
                     <TextView style="@style/SSub" android:text="Translate copied text to this language" />
                 </LinearLayout>
-                <TextView style="@style/SValue" android:text="Soon  ›" />
+                <TextView android:id="@+id/valTransLang" style="@style/SValue" android:text="Ask me  ›" />
             </LinearLayout>
 
             <LinearLayout style="@style/SRow" android:clickable="false" android:background="@null">
@@ -270,7 +270,7 @@
                     <TextView style="@style/STitle" android:text="Accent color" />
                     <TextView style="@style/SSub" android:text="Choose your accent color" />
                 </LinearLayout>
-                <TextView style="@style/SValue" android:text="Soon  ›" />
+                <TextView android:id="@+id/valAccent" style="@style/SValue" android:text="Purple  ›" />
             </LinearLayout>
 
             <LinearLayout android:id="@+id/rowTextSize" style="@style/SRow">
@@ -279,7 +279,7 @@
                     <TextView style="@style/STitle" android:text="Text size" />
                     <TextView style="@style/SSub" android:text="Adjust app text size" />
                 </LinearLayout>
-                <TextView style="@style/SValue" android:text="Soon  ›" />
+                <TextView android:id="@+id/valTextSize" style="@style/SValue" android:text="Default  ›" />
             </LinearLayout>
         </LinearLayout>
 

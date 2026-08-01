@@ -64,4 +64,20 @@ object SettingsPrefs {
 
     fun soundOnCopy(c: Context): Boolean = p(c).getBoolean("sound_copy", false)
     fun setSoundOnCopy(c: Context, v: Boolean) = p(c).edit().putBoolean("sound_copy", v).apply()
+
+    // Appearance. The app picks its own dark/light rather than following the
+    // phone, because the floating button is used inside other people's apps and
+    // a surprise switch mid-session is worse than a setting.
+    fun darkMode(c: Context): Boolean = p(c).getBoolean("dark_mode", true)
+    fun setDarkMode(c: Context, v: Boolean) = p(c).edit().putBoolean("dark_mode", v).apply()
+
+    fun accent(c: Context): String = p(c).getString("accent", "purple").orEmpty()
+    fun setAccent(c: Context, v: String) = p(c).edit().putString("accent", v).apply()
+
+    fun textScale(c: Context): Float = p(c).getFloat("text_scale", 1.0f)
+    fun setTextScale(c: Context, v: Float) = p(c).edit().putFloat("text_scale", v).apply()
+
+    /** Target language for Translate. Empty means "ask me each time". */
+    fun translateLang(c: Context): String = p(c).getString("translate_lang", "").orEmpty()
+    fun setTranslateLang(c: Context, v: String) = p(c).edit().putString("translate_lang", v).apply()
 }

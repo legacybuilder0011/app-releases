@@ -1,6 +1,5 @@
 package com.plutoforce.tapcopy
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -22,7 +21,7 @@ import android.widget.Toast
  * The work happens on the TapSave backend, which already holds the key for
  * TapSave's transcripts. Only the text in the box on this screen is sent.
  */
-class AiToolsActivity : Activity() {
+class AiToolsActivity : ThemedActivity() {
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -36,14 +35,10 @@ class AiToolsActivity : Activity() {
     private var running = false
     private var result = ""
 
-    private val languages = listOf(
-        "English", "Pidgin", "Yoruba", "Igbo", "Hausa", "French", "Spanish",
-        "Portuguese", "Arabic", "Swahili", "German", "Hindi", "Chinese"
-    )
-    private val tones = listOf(
-        "professional", "friendly", "funny", "confident", "casual", "polite",
-        "urgent", "gentle"
-    )
+    companion object {
+        /** Text to work on, when another screen hands it over. */
+        const val EXTRA_TOOL = "tool"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,6 +81,21 @@ class AiToolsActivity : Activity() {
             source.setText(result)
             hideResult()
         }
+
+        // Arriving straight from the copy sheet with a job already chosen.
+        intent?.getStringExtra(EXTRA_TOOL)?.let { tool ->
+            val label = labelFor(tool)
+            source.post { start(tool, label) }
+        }
+    }
+
+    private fun labelFor(tool: String): String = when (tool) {
+        AiClient.REWRITE -> "Rewritten"
+        AiClient.SHORTEN -> "Shortened"
+        AiClient.TRANSLATE -> "Translated"
+        AiClient.HOOK -> "With a hook"
+        AiClient.TONE -> "New tone"
+        else -> "Reworded"
     }
 
     /** Whatever the user most likely wants to work on, so the box is rarely empty. */
@@ -106,8 +116,16 @@ class AiToolsActivity : Activity() {
             return
         }
         when (tool) {
-            AiClient.TRANSLATE -> choose("Translate to", languages) { run(tool, text, it, "$label → $it") }
-            AiClient.TONE -> choose("Make it sound", tones) { run(tool, text, it, "Tone: $it") }
+            AiClient.TRANSLATE -> {
+                // Settings can pin a language; otherwise ask, saved one first.
+                val preferred = SettingsPrefs.translateLang(this)
+                if (preferred.isNotBlank()) {
+                    run(tool, text, preferred, "$label → $preferred")
+                } else {
+                    choose("Translate to", AiClient.LANGUAGES) { run(tool, text, it, "$label → $it") }
+                }
+            }
+            AiClient.TONE -> choose("Make it sound", AiClient.TONES) { run(tool, text, it, "Tone: $it") }
             else -> run(tool, text, "", label)
         }
     }

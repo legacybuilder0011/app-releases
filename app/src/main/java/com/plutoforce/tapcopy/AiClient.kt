@@ -16,6 +16,17 @@ object AiClient {
 
     private const val BASE = "https://tapsave-backend.onrender.com"
 
+    /** Offered for Translate, in Settings and on the AI Tools screen. */
+    val LANGUAGES = listOf(
+        "English", "Pidgin", "Yoruba", "Igbo", "Hausa", "French", "Spanish",
+        "Portuguese", "Arabic", "Swahili", "German", "Hindi", "Chinese"
+    )
+
+    val TONES = listOf(
+        "professional", "friendly", "funny", "confident", "casual", "polite",
+        "urgent", "gentle"
+    )
+
     const val REWRITE = "rewrite"
     const val SHORTEN = "shorten"
     const val TRANSLATE = "translate"

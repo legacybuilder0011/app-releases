@@ -1,6 +1,5 @@
 package com.plutoforce.tapcopy
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -20,7 +19,7 @@ import android.widget.TextView
 import android.widget.Toast
 
 /** Browse, search, favourite, re-copy and delete previously copied text. */
-class HistoryActivity : Activity() {
+class HistoryActivity : ThemedActivity() {
 
     companion object {
         const val EXTRA_FAVORITES = "favorites"

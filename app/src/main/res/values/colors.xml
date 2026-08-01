@@ -1,22 +1,32 @@
 <resources>
+    <!--
+      Light theme. The dark set lives in values-night/colors.xml, and the app
+      picks between them from the Dark mode switch in Settings rather than
+      following the phone, so the choice is the user's.
+    -->
     <color name="brand">#7C5CFF</color>
     <color name="brand_dark">#5A3FE0</color>
     <color name="brand_glow">#8B6BFF</color>
 
-    <!-- Dark theme surfaces -->
-    <color name="bg">#0B0B12</color>
-    <color name="bg_elevated">#14141F</color>
-    <color name="card">#171622</color>
-    <color name="card_stroke">#262536</color>
-    <color name="chip">#1E1D2B</color>
+    <!-- Light theme surfaces -->
+    <color name="bg">#F5F5FA</color>
+    <color name="bg_elevated">#FFFFFF</color>
+    <color name="card">#FFFFFF</color>
+    <color name="card_stroke">#E3E3EE</color>
+    <color name="chip">#ECECF4</color>
 
-    <color name="ink">#F4F4F8</color>
-    <color name="muted">#9A9AA8</color>
-    <color name="faint">#6E6E7E</color>
+    <color name="ink">#14141F</color>
+    <color name="muted">#5B5B6B</color>
+    <color name="faint">#8A8A99</color>
 
-    <color name="success">#34D399</color>
-    <color name="danger">#F87171</color>
+    <color name="success">#0F9D68</color>
+    <color name="danger">#D9484A</color>
 
     <!-- kept for older references -->
-    <color name="surface">#0B0B12</color>
+    <color name="surface">#F5F5FA</color>
+
+    <!-- Upgrade banner -->
+    <color name="banner_start">#EFEAFF</color>
+    <color name="banner_end">#F7F5FF</color>
+    <color name="banner_stroke">#DCD2FF</color>
 </resources>

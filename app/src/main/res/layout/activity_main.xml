@@ -246,7 +246,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Unlimited history, AI tools, and advanced features."
+                        android:text="AI tools and the teleprompter are already unlocked. More Pro extras on the way."
                         android:textColor="@color/muted"
                         android:textSize="13sp" />
 

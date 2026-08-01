@@ -1,6 +1,5 @@
 package com.plutoforce.tapcopy
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
@@ -24,7 +23,7 @@ import java.util.Date
  * updates as values change, and the running overlay picks new values up the next
  * time it's opened.
  */
-class TeleprompterSettingsActivity : Activity() {
+class TeleprompterSettingsActivity : ThemedActivity() {
 
     private lateinit var previewBox: View
     private lateinit var previewText: TextView

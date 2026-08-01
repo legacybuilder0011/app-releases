@@ -87,6 +87,16 @@
                         android:id="@+id/btnPhones"
                         style="@style/CategoryChip"
                         android:text="@string/cat_phones" />
+
+                    <Button
+                        android:id="@+id/btnTranslate"
+                        style="@style/CategoryChip"
+                        android:text="@string/cat_translate" />
+
+                    <Button
+                        android:id="@+id/btnAi"
+                        style="@style/CategoryChip"
+                        android:text="@string/cat_ai" />
                 </LinearLayout>
             </HorizontalScrollView>
 

@@ -207,7 +207,8 @@ class TeleprompterService : Service() {
         state = State.EDITING
         showBubble(true)
 
-        val view = LayoutInflater.from(this).inflate(R.layout.overlay_prompter_editor, null)
+        val view = LayoutInflater.from(AppTheme.wrap(this, forceDark = true)).inflate(R.layout.overlay_prompter_editor, null)
+            .also { AppTheme.applyAccent(it, this) }
         view.findViewById<View>(R.id.editorPanel).background = boxBackground()
         view.findViewById<View>(R.id.adjustPanel).background = boxBackground()
 
@@ -352,7 +353,8 @@ class TeleprompterService : Service() {
             return
         }
         val params = playParams ?: return
-        val panel = LayoutInflater.from(this).inflate(R.layout.overlay_prompter_adjust, null)
+        val panel = LayoutInflater.from(AppTheme.wrap(this, forceDark = true)).inflate(R.layout.overlay_prompter_adjust, null)
+            .also { AppTheme.applyAccent(it, this) }
         panel.background = boxBackground()
 
         wireAdjustControls(
@@ -441,7 +443,8 @@ class TeleprompterService : Service() {
         state = State.COUNTDOWN
         showBubble(false)
 
-        val view = LayoutInflater.from(this).inflate(R.layout.overlay_prompter_countdown, null)
+        val view = LayoutInflater.from(AppTheme.wrap(this, forceDark = true)).inflate(R.layout.overlay_prompter_countdown, null)
+            .also { AppTheme.applyAccent(it, this) }
         val label = view.findViewById<TextView>(R.id.countdownText)
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -476,7 +479,8 @@ class TeleprompterService : Service() {
         removeView(editorView); editorView = null
         showBubble(false)
 
-        val view = LayoutInflater.from(this).inflate(R.layout.overlay_prompter_play, null)
+        val view = LayoutInflater.from(AppTheme.wrap(this, forceDark = true)).inflate(R.layout.overlay_prompter_play, null)
+            .also { AppTheme.applyAccent(it, this) }
         view.background = boxBackground()
         playView = view
 
