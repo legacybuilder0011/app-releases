@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/aiScroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg"
@@ -35,18 +36,119 @@
                 android:textColor="@color/ink"
                 android:textSize="22sp"
                 android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- What the tools work on. Pre-filled with the last thing copied. -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Your text"
+            android:textColor="@color/muted"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/sourceText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/card_background"
+            android:gravity="top|start"
+            android:hint="Paste text, or use your last copy"
+            android:inputType="textMultiLine|textCapSentences"
+            android:lineSpacingExtra="4dp"
+            android:maxLines="10"
+            android:minLines="4"
+            android:padding="16dp"
+            android:textColor="@color/ink"
+            android:textColorHint="@color/faint"
+            android:textSize="15sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/useLastCopy"
+                style="@style/CategoryChip"
+                android:text="Last copy" />
+
+            <Button
+                android:id="@+id/usePaste"
+                style="@style/CategoryChip"
+                android:text="Paste" />
+
+            <Button
+                android:id="@+id/useClear"
+                style="@style/CategoryChip"
+                android:text="Clear" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/aiStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="@color/muted"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
+        <!-- Result. Hidden until a tool has actually produced something. -->
+        <LinearLayout
+            android:id="@+id/resultCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/card_background"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:visibility="gone">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:id="@+id/resultTitle"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/pro_badge"
-                android:text="PRO"
-                android:textColor="#FFFFFF"
-                android:textSize="11sp"
+                android:textColor="@color/brand"
+                android:textSize="13sp"
                 android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/resultText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:lineSpacingExtra="4dp"
+                android:textColor="@color/ink"
+                android:textIsSelectable="true"
+                android:textSize="15sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/resultCopy"
+                    style="@style/CategoryChip"
+                    android:text="Copy" />
+
+                <Button
+                    android:id="@+id/resultShare"
+                    style="@style/CategoryChip"
+                    android:text="Share" />
+
+                <Button
+                    android:id="@+id/resultReuse"
+                    style="@style/CategoryChip"
+                    android:text="Edit again" />
+            </LinearLayout>
         </LinearLayout>
 
         <TextView android:id="@+id/toolRewrite" style="@style/AiRow"
+            android:layout_marginTop="18dp"
             android:text="✏️  Rewrite\nMake your text better" />
         <TextView android:id="@+id/toolShorten" style="@style/AiRow"
             android:text="✂️  Shorten\nMake it short and clear" />
@@ -56,28 +158,18 @@
             android:text="🪝  Add Hook\nAdd a powerful opening line" />
         <TextView android:id="@+id/toolTone" style="@style/AiRow"
             android:text="🎭  Change Tone\nProfessional, funny, etc." />
-        <TextView android:id="@+id/toolPlagiarism" style="@style/AiRow"
-            android:text="🔏  Remove Plagiarism\nMake it 100% original" />
-
-        <Button
-            android:id="@+id/upgradeButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/button_primary"
-            android:text="👑  Upgrade to Pro — unlock all AI features"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textSize="15sp" />
+        <TextView android:id="@+id/toolReword" style="@style/AiRow"
+            android:text="🔏  Reword\nSame meaning, fresh wording" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:gravity="center"
-            android:text="AI Tools are coming soon."
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="8dp"
+            android:lineSpacingExtra="3dp"
+            android:text="Text you run through AI Tools is sent to the TapSave server to be processed. Screenshots and recognized text still stay on your phone."
             android:textColor="@color/faint"
-            android:textSize="13sp" />
+            android:textSize="12sp" />
 
     </LinearLayout>
 </ScrollView>
