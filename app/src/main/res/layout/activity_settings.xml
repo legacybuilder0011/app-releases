@@ -110,7 +110,7 @@
                 <TextView style="@style/SEmoji" android:text="🅰" />
                 <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
                     <TextView style="@style/STitle" android:text="Auto-detect captions" />
-                    <TextView style="@style/SSub" android:text="Pre-select the caption block automatically" />
+                    <TextView style="@style/SSub" android:text="Pre-tick the caption for you. Off by default — you choose what to copy" />
                 </LinearLayout>
                 <Switch android:id="@+id/swAutoDetect" android:layout_width="wrap_content" android:layout_height="wrap_content" />
             </LinearLayout>

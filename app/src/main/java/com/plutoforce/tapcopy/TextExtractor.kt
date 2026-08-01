@@ -53,6 +53,9 @@ object TextExtractor {
     )
 
     private val COUNT_ONLY = Regex("^\\d+([.,]\\d+)?\\s*[kmb]?$", RegexOption.IGNORE_CASE)
+    // Music attribution and in-app search rows sit right beside the caption.
+    private val ATTRIBUTION = Regex("^[\u266a\u266b\u2669\ud83c\udfb5]?\\s*(contains|original sound|sound)\\s*:", RegexOption.IGNORE_CASE)
+    private val SEARCH_ROW = Regex("^(search|find)\\b.{0,60}$", RegexOption.IGNORE_CASE)
     private val CLOCK = Regex("^\\d{1,2}:\\d{2}(\\s*[ap]m)?$", RegexOption.IGNORE_CASE)
     private val ISO_DATE = Regex("^\\d{4}-\\d{2}-\\d{2}$")
 
@@ -69,6 +72,8 @@ object TextExtractor {
             lower in NOISE_PHRASES -> true
             lower in BUTTON_WORDS -> true
             COUNT_ONLY.matches(line) -> true
+            ATTRIBUTION.containsMatchIn(line) -> true
+            SEARCH_ROW.matches(line) -> true
             CLOCK.matches(line) -> true
             ISO_DATE.matches(line) -> true
             REL_DATE.matches(line) -> true

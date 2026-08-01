@@ -29,7 +29,10 @@ object SettingsPrefs {
     fun resetBubblePos(c: Context) = p(c).edit().remove("bubble_x").remove("bubble_y").apply()
 
     // Capture & copy
-    fun autoDetectCaptions(c: Context): Boolean = p(c).getBoolean("auto_detect", true)
+    // Off by default: guessing which blocks are the caption reached too far and
+    // ticked search bars and comment boxes. Choosing is the user's job; this is
+    // here for anyone who wants the guess back.
+    fun autoDetectCaptions(c: Context): Boolean = p(c).getBoolean("auto_detect", false)
     fun setAutoDetectCaptions(c: Context, v: Boolean) = p(c).edit().putBoolean("auto_detect", v).apply()
 
     fun defaultAction(c: Context): String = p(c).getString("default_action", "ask").orEmpty() // ask/caption/all
