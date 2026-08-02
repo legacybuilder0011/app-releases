@@ -68,6 +68,7 @@ class AiToolsActivity : ThemedActivity() {
             hideResult()
         }
 
+        wire(R.id.toolCleanup, AiClient.CLEANUP, "Cleaned up")
         wire(R.id.toolRewrite, AiClient.REWRITE, "Rewritten")
         wire(R.id.toolShorten, AiClient.SHORTEN, "Shortened")
         wire(R.id.toolTranslate, AiClient.TRANSLATE, "Translated")
@@ -90,6 +91,7 @@ class AiToolsActivity : ThemedActivity() {
     }
 
     private fun labelFor(tool: String): String = when (tool) {
+        AiClient.CLEANUP -> "Cleaned up"
         AiClient.REWRITE -> "Rewritten"
         AiClient.SHORTEN -> "Shortened"
         AiClient.TRANSLATE -> "Translated"

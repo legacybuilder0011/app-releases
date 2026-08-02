@@ -28,7 +28,8 @@ class TextOverlayView @JvmOverloads constructor(
     private val inverseMatrix = Matrix()
     private val density = resources.displayMetrics.density
 
-    private val accent = Color.rgb(108, 77, 255)
+    // Matches the accent colour chosen in Settings.
+    private val accent = AppTheme.accent(context).base
 
     private val outlinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
@@ -42,11 +43,11 @@ class TextOverlayView @JvmOverloads constructor(
     }
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        color = Color.argb(40, 108, 77, 255)
+        color = Color.argb(40, Color.red(accent), Color.green(accent), Color.blue(accent))
     }
     private val selectedFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
-        color = Color.argb(110, 108, 77, 255)
+        color = Color.argb(110, Color.red(accent), Color.green(accent), Color.blue(accent))
     }
     private val circleBgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
@@ -89,10 +90,30 @@ class TextOverlayView @JvmOverloads constructor(
     fun selectedCount(): Int = selected.size
 
     /** The selected blocks' text, joined top-to-bottom in reading order. */
-    fun selectedText(): String =
-        selected.map { regions[it] }
-            .sortedWith(compareBy({ it.box.top }, { it.box.left }))
+    fun selectedText(): String = inReadingOrder(selected.map { regions[it] })
+
+    /**
+     * Every block worth copying, in reading order.
+     *
+     * This is what "Copy all" uses instead of the recogniser's raw output: the
+     * raw text carries the clock, the battery, like counts and button labels in
+     * whatever order the recogniser found them, which is how a copy ends up
+     * scattered.
+     */
+    fun allText(): String = inReadingOrder(regions)
+
+    /**
+     * Top to bottom, then left to right. Blocks whose tops are within a line's
+     * height of each other count as the same row, so a line split into two
+     * boxes doesn't come back out of order.
+     */
+    private fun inReadingOrder(items: List<TextRegion>): String {
+        if (items.isEmpty()) return ""
+        val band = (items.map { it.box.height() }.average() * 0.6).toInt().coerceAtLeast(1)
+        return items
+            .sortedWith(compareBy({ it.box.top / band }, { it.box.left }))
             .joinToString("\n") { it.text }
+    }
 
     /** The caption's text: every block in the caption cluster, in reading order. */
     fun bestCaptionText(): String {

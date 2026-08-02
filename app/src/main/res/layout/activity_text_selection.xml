@@ -89,6 +89,11 @@
                         android:text="@string/cat_phones" />
 
                     <Button
+                        android:id="@+id/btnFix"
+                        style="@style/CategoryChip"
+                        android:text="@string/cat_fix" />
+
+                    <Button
                         android:id="@+id/btnTranslate"
                         style="@style/CategoryChip"
                         android:text="@string/cat_translate" />

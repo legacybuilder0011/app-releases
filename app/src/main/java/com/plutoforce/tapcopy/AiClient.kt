@@ -27,6 +27,7 @@ object AiClient {
         "urgent", "gentle"
     )
 
+    const val CLEANUP = "cleanup"
     const val REWRITE = "rewrite"
     const val SHORTEN = "shorten"
     const val TRANSLATE = "translate"

@@ -34,6 +34,7 @@
     <string name="cat_links">Links</string>
     <string name="cat_emails">Emails</string>
     <string name="cat_phones">Phones</string>
+    <string name="cat_fix">🧹 Fix text</string>
     <string name="cat_translate">🌐 Translate</string>
     <string name="cat_ai">✨ AI</string>
     <string name="cat_hint">Tip: select blocks (or none = whole screen), then tap a category to copy just that.</string>

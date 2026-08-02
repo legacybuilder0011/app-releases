@@ -67,7 +67,7 @@ class TextSelectionActivity : ThemedActivity() {
 
         copySelectedButton.setOnClickListener { copySelection() }
         copyAllButton.setOnClickListener {
-            if (recognizedText.isNotBlank()) copyAndReturn(recognizedText)
+            copyEverything()
         }
         stitchButton.setOnClickListener {
             StitchBuffer.start(this)
@@ -78,7 +78,8 @@ class TextSelectionActivity : ThemedActivity() {
             if (text.isBlank()) toast(getString(R.string.need_selection)) else stitchAddAndReturn(text)
         }
         addScreenButton.setOnClickListener {
-            if (recognizedText.isNotBlank()) stitchAddAndReturn(recognizedText)
+            val screen = everything()
+            if (screen.isNotBlank()) stitchAddAndReturn(screen)
         }
         finishButton.setOnClickListener { finishStitch() }
 
@@ -106,6 +107,7 @@ class TextSelectionActivity : ThemedActivity() {
         btnPhones.setOnClickListener {
             copyExtracted("phone numbers") { TextExtractor.phones(it).joinToString("\n") }
         }
+        findViewById<Button>(R.id.btnFix).setOnClickListener { handToAi(AiClient.CLEANUP) }
         findViewById<Button>(R.id.btnTranslate).setOnClickListener { handToAi(AiClient.TRANSLATE) }
         findViewById<Button>(R.id.btnAi).setOnClickListener { handToAi(null) }
 
@@ -247,10 +249,32 @@ class TextSelectionActivity : ThemedActivity() {
         closeAndCleanUp()
     }
 
+    /**
+     * Everything worth copying: the highlighted blocks in reading order.
+     *
+     * Not the recogniser's raw dump — that one carries the clock, the battery
+     * percentage, like counts and button labels, which is what turned a copied
+     * caption into a scattered mess. Raw text is only the fallback for when
+     * nothing survived the filter.
+     */
+    private fun everything(): String {
+        val kept = overlay.allText().trim()
+        return if (kept.isNotBlank()) kept else recognizedText
+    }
+
+    private fun copyEverything() {
+        val text = everything()
+        if (text.isBlank()) {
+            toast("No readable text yet")
+            return
+        }
+        copyAndReturn(text)
+    }
+
     /** Selected blocks if any are ticked, otherwise the whole screen's text. */
     private fun sourceText(): String {
         val selected = overlay.selectedText()
-        return if (selected.isNotBlank()) selected else recognizedText
+        return if (selected.isNotBlank()) selected else everything()
     }
 
     /**
@@ -262,7 +286,7 @@ class TextSelectionActivity : ThemedActivity() {
         val source = when {
             selected.isNotBlank() -> selected
             overlay.bestCaptionText().isNotBlank() -> overlay.bestCaptionText()
-            else -> recognizedText
+            else -> everything()
         }
         val result = TextExtractor.cleanCaption(source).trim()
         if (result.isBlank()) {
@@ -310,7 +334,7 @@ class TextSelectionActivity : ThemedActivity() {
         if (!textReady) return
         when (SettingsPrefs.defaultAction(this)) {
             "caption" -> copyCaption()
-            "all" -> if (recognizedText.isNotBlank()) copyAndReturn(recognizedText)
+            "all" -> copyEverything()
             else -> Unit
         }
     }

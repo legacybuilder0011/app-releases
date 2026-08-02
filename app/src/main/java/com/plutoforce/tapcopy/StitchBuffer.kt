@@ -40,7 +40,7 @@ object StitchBuffer {
     fun append(context: Context, newText: String) {
         val addition = newText.trim()
         if (addition.isBlank()) return
-        val merged = mergeWithOverlap(text(context), addition)
+        val merged = dropRepeats(mergeWithOverlap(text(context), addition))
         prefs(context).edit()
             .putBoolean(KEY_ACTIVE, true)
             .putString(KEY_TEXT, merged)
@@ -59,6 +59,30 @@ object StitchBuffer {
 
     private fun normalize(line: String): String =
         line.trim().replace(Regex("\\s+"), " ").lowercase()
+
+    /**
+     * Drops lines already in the buffer.
+     *
+     * Two captures of the same post rarely line up exactly — the user scrolls a
+     * little, so the overlap merge above only catches a run of lines repeated
+     * end-to-start. Anything that comes back a second time further down (the
+     * whole caption, when the second capture caught most of the first) is
+     * dropped here.
+     *
+     * Only lines with something to them are compared: a caption may legitimately
+     * repeat a short line like "daily", and losing one would be worse than
+     * keeping a duplicate.
+     */
+    private fun dropRepeats(text: String): String {
+        val seen = HashSet<String>()
+        val kept = ArrayList<String>()
+        for (line in text.lines()) {
+            val key = normalize(line)
+            if (key.length >= 8 && !seen.add(key)) continue
+            kept.add(line)
+        }
+        return kept.joinToString("\n")
+    }
 
     /**
      * Joins two blocks of text so that lines repeated at the end of [existing]

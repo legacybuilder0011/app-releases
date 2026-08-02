@@ -147,8 +147,10 @@
             </LinearLayout>
         </LinearLayout>
 
-        <TextView android:id="@+id/toolRewrite" style="@style/AiRow"
+        <TextView android:id="@+id/toolCleanup" style="@style/AiRow"
             android:layout_marginTop="18dp"
+            android:text="🧹  Fix copied text\nRepair OCR mistakes and split lines" />
+        <TextView android:id="@+id/toolRewrite" style="@style/AiRow"
             android:text="✏️  Rewrite\nMake your text better" />
         <TextView android:id="@+id/toolShorten" style="@style/AiRow"
             android:text="✂️  Shorten\nMake it short and clear" />

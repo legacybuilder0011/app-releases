@@ -53,6 +53,15 @@ object TextExtractor {
     )
 
     private val COUNT_ONLY = Regex("^\\d+([.,]\\d+)?\\s*[kmb]?$", RegexOption.IGNORE_CASE)
+    // Status bar leftovers: "10%", "88 %", "3:07 4•", "3:08".
+    private val PERCENT = Regex("^\\d{1,3}\\s*%$")
+    private val STATUS_CLOCK = Regex("^\\d{1,2}:\\d{2}\\b.{0,12}$")
+    // The search pill reads as "Q Find related content" — the magnifier becomes
+    // a letter, so allow a stray glyph before the word.
+    private val SEARCH_PILL = Regex("^\\W?\\s*\\w?\\s*(find related content|search .{0,30}|find .{0,30})$", RegexOption.IGNORE_CASE)
+    // A music credit: a note glyph (which OCR usually reads as J) then
+    // "Title - Artist". Kept narrow so a caption with a dash isn't caught.
+    private val MUSIC_CREDIT = Regex("^[J\\u266a\\u266b\\u2669\\ud83c\\udfb5]\\s+.{1,40}\\s[-–]\\s.{1,30}$")
     // Music attribution and in-app search rows sit right beside the caption.
     private val ATTRIBUTION = Regex("^[\u266a\u266b\u2669\ud83c\udfb5]?\\s*(contains|original sound|sound)\\s*:", RegexOption.IGNORE_CASE)
     private val SEARCH_ROW = Regex("^(search|find)\\b.{0,60}$", RegexOption.IGNORE_CASE)
@@ -68,9 +77,17 @@ object TextExtractor {
         val line = text.trim()
         if (line.length <= 1) return true
         val lower = line.lowercase()
+        // "Add comment.." and "Add comment…" are the same button.
+        val bare = lower.trimEnd('.', '\u2026', ':', ' ')
         return when {
             lower in NOISE_PHRASES -> true
+            bare in NOISE_PHRASES -> true
             lower in BUTTON_WORDS -> true
+            bare in BUTTON_WORDS -> true
+            PERCENT.matches(line) -> true
+            STATUS_CLOCK.matches(line) -> true
+            SEARCH_PILL.matches(line) -> true
+            MUSIC_CREDIT.matches(line) -> true
             COUNT_ONLY.matches(line) -> true
             ATTRIBUTION.containsMatchIn(line) -> true
             SEARCH_ROW.matches(line) -> true
